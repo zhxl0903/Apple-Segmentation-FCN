@@ -5,8 +5,6 @@ import time
 import torch
 import torch.utils.data
 import torchvision
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
 
@@ -17,7 +15,7 @@ import utility.utils as utils
 import utility.transforms as T
 
 ######################################################
-# Train either a Faster-RCNN or Mask-RCNN predictor
+# Train either a FCN-Resnet-50 or FCN-Resnet-101 predictor
 # using the MinneApple dataset
 ######################################################
 
