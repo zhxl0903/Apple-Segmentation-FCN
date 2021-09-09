@@ -165,7 +165,7 @@ def main(args):
             'model': model.state_dict(),
             'optimizer': optimizer.state_dict(),
             'lr_scheduler': lr_scheduler.state_dict(),
-            },  os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)))
+            },  os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
         # evaluate after every epoch
         evaluate(model, data_loader_test, device=device)
