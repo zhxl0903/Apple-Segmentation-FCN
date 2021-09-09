@@ -87,6 +87,29 @@ def get_fcn_resnet101_model_instance(num_classes):
     :return: instance of FCN-Resnet-101 model.
     """
     model = fcn_resnet101(pretrained=False, num_classes=num_classes)
+
+    arch_type = 'fcn'
+    backbone = 'resnet101'
+
+    # Loads pretrained model with num_classes number of classes
+    arch = arch_type + '_' + backbone + '_coco'
+    model_url = model_urls[arch]
+    if model_url is None:
+        raise NotImplementedError('pretrained {} is not supported as of now'.format(arch))
+    else:
+
+        # Loads state dictionary of pretrained model
+        state_dict = torch.hub.load_state_dict_from_url(model_url, progress=True)
+
+        # gets state dict of model
+        state_dict_self = model.state_dict()
+        for i, (name, param) in enumerate(state_dict_self.items()):
+            if name in ['classifier.4.weight', 'classifier.4.bias']:
+                state_dict_self[name].copy_(state_dict[name][:num_classes])
+                # print(torch.all(model.state_dict()[name] == state_dict[name][:num_classes]))
+            else:
+                state_dict_self[name].copy_(state_dict[name])
+                # print(torch.all(model.state_dict()[name] == state_dict[name]))
     return model
 
 def get_maskrcnn_model_instance(num_classes):
