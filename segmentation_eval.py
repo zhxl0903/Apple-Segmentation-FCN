@@ -9,7 +9,7 @@ from sklearn.metrics import confusion_matrix
 from statistics import mean
 
 import utility.utils as utils
-import utility transforms as T
+import utility.transforms as T
 
 
 def get_transform(train):
@@ -151,6 +151,6 @@ if __name__ == "__main__":
     output_file.write("fwIoU: {} \n".format(float(mean(fious))))
     output_file.write("mAcc: {} \n".format(float(mean(mAcc))))
     output_file.write("pAcc: {} \n".format(float(mean(pAcc))))
-    output_file.write("cIoU: {} \n".format(float(np.mean(ious, axis=0)))
+    output_file.write("cIoU: {} \n".format(float(np.mean(ious, axis=0))))
     output_file.write("cAcc: {} \n".format(float(np.mean(mAccs, axis=0))))
     output_file.close()
