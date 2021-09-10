@@ -73,8 +73,7 @@ def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, pri
         images = torch.stack(list(images), dim=0).to(device)
         targets = torch.stack([t["masks"] for t in targets], dim=0).long().to(device)
 
-        # FCN-Resnet takes images as input
-        # Output is the responses before applying activation
+        # Output is the responses before applying softmax activation
         output = model(images)
 
         loss = CE_Loss(output, targets)
