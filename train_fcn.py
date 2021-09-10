@@ -28,8 +28,7 @@ model_urls = {
 
 def get_transform(train):
     transforms = []
-    transforms.append(T.CollapseMasks())
-    transforms.append(T.ToBinaryClasses())
+    transforms.append(T.CollapseMasks(keepdim=False))
     transforms.append(T.ToTensor())
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))

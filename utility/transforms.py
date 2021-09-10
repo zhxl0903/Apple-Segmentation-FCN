@@ -55,6 +55,9 @@ class CollapseMasks(object):
         This transform collapses masks in target using OR operation.
     """
 
+    def __init__(self, keepdim=True):
+        self.keepdim = keepdim
+
     def __call__(self, image, target):
         """
         This method collapses masks in target into a binary mask using OR operation given
@@ -64,7 +67,7 @@ class CollapseMasks(object):
         :return: target dictionary in which masks are collapsed to a binary mask using OR operation
         """
         if "masks" in target:
-            target['masks'] = target["masks"].any(0, keepdim=True)
+            target['masks'] = target["masks"].any(0, keepdim=self.keepdim)
         return image, target
 
 
