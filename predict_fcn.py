@@ -11,6 +11,9 @@ from torchvision.models.segmentation import fcn_resnet101
 import utility.utils as utils
 import utility.transforms as T
 
+import imageio
+from os.path import *
+
 
 ######################################################
 # Predict with either a FCN-Resnet-50 or FCN-Resnet-101 predictor
@@ -45,6 +48,7 @@ def get_fcn_resnet50_model_instance(num_classes):
 
     return model
 
+
 def get_fcn_resnet101_model_instance(num_classes):
     """
     This method gets an instance of FCN-Resnet-101 model given num_classes.
@@ -64,6 +68,7 @@ def get_fcn_resnet101_model_instance(num_classes):
 
     return model
 
+
 def main(args):
     num_classes = 2
     device = args.device
@@ -81,6 +86,9 @@ def main(args):
     model.load_state_dict(checkpoint['model'], strict=False)
     model.eval()
 
+    # Gets list of image dirs
+    imgs = list(sorted(os.listdir(os.path.join(args.data_path, "images"))))
+
     print("Creating data loaders")
     dataset_test = AppleDataset(args.data_path, get_transform(train=False))
     data_loader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1,
@@ -88,24 +96,30 @@ def main(args):
                                                    collate_fn=utils.collate_fn)
 
     # Create output directory
-    base_path = os.path.dirname(args.output_file)
+    base_path = os.path.dirname(args.output_path)
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
     # Predict on mask on each image
-    f = open(args.output_file, 'a')
     for image, targets in data_loader_test:
+        mask_name = basename(imgs[targets[0]['image_id'].item()])
+        print('Working on {}...'.format(mask_name))
+
         image = torch.stack(list(image), dim=0).to(device)
         output = model(image)
 
         # Saves mask
+        output = output[0].cpu().detach().numpy()
+        mask = (np.argmax(output, axis=0) * 255).astype(np.uint8)
+        imageio.imsave(join(base_path, mask_name), mask)
 
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description='PyTorch Detection')
     parser.add_argument('--data_path', required=True, help='path to the data to predict on')
-    parser.add_argument('--output_file', required=True, help='path where to write the prediction outputs')
+    parser.add_argument('--output_path', required=True, help='path where to write the prediction outputs')
     parser.add_argument('--weight_file', required=True, help='path to the weight file')
     parser.add_argument('--device', default='cpu', help='device to use. Either cpu or cuda')
     model = parser.add_mutually_exclusive_group(required=True)
