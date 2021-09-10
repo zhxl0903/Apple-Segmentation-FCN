@@ -26,6 +26,7 @@ model_urls = {
     'deeplabv3_resnet101_coco': 'https://download.pytorch.org/models/deeplabv3_resnet101_coco-586e9e4e.pth',
 }
 
+
 def get_transform(train):
     transforms = []
     transforms.append(T.CollapseMasks(keepdim=False))
@@ -33,6 +34,7 @@ def get_transform(train):
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
+
 
 def get_fcn_resnet50_model_instance(num_classes):
     """
@@ -74,6 +76,7 @@ def get_fcn_resnet50_model_instance(num_classes):
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
     return model
+
 
 def get_fcn_resnet101_model_instance(num_classes):
     """
@@ -146,7 +149,11 @@ def main(args):
     model.to(device)
 
     params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
+
+    if args.optim == 'adam':
+        optimizer = torch.optim.Adam(params, lr=args.lr, betas=(args.beta1, args.beta2), eps=args.epsilon, weight_decay=args.weight_decay)
+    else:
+        optimizer = torch.optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
     #  lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_steps, gamma=args.lr_gamma)
@@ -165,11 +172,11 @@ def main(args):
 
         if args.output_dir:
             torch.save({
-            'epoch': epoch,
-            'model': model.state_dict(),
-            'optimizer': optimizer.state_dict(),
-            'lr_scheduler': lr_scheduler.state_dict(),
-            },  os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
+                'epoch': epoch,
+                'model': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'lr_scheduler': lr_scheduler.state_dict(),
+            }, os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
         # evaluate after every epoch
         evaluate_fcn(model, data_loader_test, device=device)
@@ -181,6 +188,7 @@ def main(args):
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
     parser.add_argument('--data_path', default='/home/nicolai/phd/data/cvppp_2019/apple_dataset', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
@@ -189,8 +197,12 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--batch-size', default=2, type=int)
     parser.add_argument('--epochs', default=13, type=int, metavar='N', help='number of total epochs to run')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 16)')
+    parser.add_argument('--optim', default='adam', help='optimizer: adam, sgd')
     parser.add_argument('--lr', default=0.02, type=float, help='initial learning rate')
-    parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
+    parser.add_argument('--beta1', default=0.9, type=float, metavar='b1', help='adam beta 1')
+    parser.add_argument('--beta2', default=0.999, type=float, metavar='b2', help='adam beta 2')
+    parser.add_argument('--epsilon', default=1e-8, type=float, metavar='eps', help='adam epsilon for numerical stability')
+    parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='sgd momentum')
     parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float, metavar='W', help='weight decay (default: 1e-4)', dest='weight_decay')
     parser.add_argument('--lr-step-size', default=8, type=int, help='decrease lr every step-size epochs')
     parser.add_argument('--lr-steps', default=[8, 11], nargs='+', type=int, help='decrease lr every step-size epochs')
@@ -201,7 +213,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(args.model)
-    assert(args.model in ['fcn_resnet50', 'fcn_resnet101'])
+    assert (args.model in ['fcn_resnet50', 'fcn_resnet101'])
 
     if args.output_dir:
         utils.mkdir(args.output_dir)
