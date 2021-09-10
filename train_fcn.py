@@ -9,7 +9,7 @@ from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
 
 from data.apple_dataset import AppleDataset
-from utility.engine import train_one_epoch, evaluate
+from utility.engine import train_one_epoch_fcn_resnet, evaluate
 
 import utility.utils as utils
 import utility.transforms as T
@@ -159,7 +159,7 @@ def main(args):
     print("Start training")
     start_time = time.time()
     for epoch in range(args.epochs):
-        train_one_epoch(model, optimizer, data_loader, device, epoch, args.print_freq)
+        train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, args.print_freq)
         lr_scheduler.step()
 
         if args.output_dir:
