@@ -48,3 +48,35 @@ class ToTensor(object):
     def __call__(self, image, target):
         image = F.to_tensor(image)
         return image, target
+
+class CollapseMasks(object):
+    """
+        This transform collapses masks in target using OR operation.
+    """
+    def __call__(self, image, target):
+        """
+        This method collapses masks in target into a binary mask using OR operation given
+        image and target.
+        :param image: image
+        :param target: target dictionary
+        :return: target dictionary in which masks are collapsed to a binary mask using OR operation
+        """
+        if "masks" in target:
+            target['masks'] = target["masks"].any(0, keepdim=True)
+        return image, target
+
+class ToBinaryClasses(object):
+    """
+        This transform coverts binary masks to 2 masks for classes, background and object
+    """
+    def __call__(self, image, target):
+        """
+        This method converts masks in target to 2 classes given image and target.
+        :param image: image
+        :param target: target dictionary in which masks contain a single binary mask
+        :return: target dictionary in which masks contain 2 masks
+        """
+
+        if "masks" in target:
+            target["masks"] = torch.cat([(1 - target["masks"]).clone(), target["masks"].clone()], dim=0)
+        return image, target

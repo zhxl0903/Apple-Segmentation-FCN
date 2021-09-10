@@ -84,6 +84,11 @@ def get_fcn_resnet101_model_instance(num_classes):
     :param num_classes: number of classes
     :return: instance of FCN-Resnet-101 model.
     """
+
+    # Checks constraint on num_classes
+    if num_classes <= 0 or num_classes > 21:
+        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
+
     model = fcn_resnet101(pretrained=False, num_classes=num_classes)
 
     arch_type = 'fcn'
