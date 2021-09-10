@@ -36,14 +36,15 @@ def get_transform(train):
     return T.Compose(transforms)
 
 
-def get_fcn_resnet50_model_instance(num_classes):
+def get_fcn_resnet50_model_instance(num_classes, pretrained=True):
     """
-    This method gets an instance of FCN-Resnet-50 model given num_classes.
-    Model is pretrained on a subset of COCO train2017, on the 20 categories
-    that are present in the Pascal VOC dataset. Output layer of model
+    This method gets an instance of FCN-Resnet-50 model given num_classes, pretrained.
+    If pretrained, then the model is pretrained on a subset of COCO train2017, on the
+    20 categories that are present in the Pascal VOC dataset. Output layer of model
     uses the first num_classes pretrained filters. 0 < num_classes <= 21
 
     :param num_classes: number of classes
+    :param pretrained: loads pretrained model iff pretrained
     :return: instance of FCN-Resnet-50 model.
     """
 
@@ -52,6 +53,9 @@ def get_fcn_resnet50_model_instance(num_classes):
         raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
 
     model = fcn_resnet50(pretrained=False, num_classes=num_classes)
+
+    if not pretrained:
+        return model
 
     arch_type = 'fcn'
     backbone = 'resnet50'
@@ -75,17 +79,19 @@ def get_fcn_resnet50_model_instance(num_classes):
             else:
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
+    print('Loaded pretrained model')
     return model
 
 
-def get_fcn_resnet101_model_instance(num_classes):
+def get_fcn_resnet101_model_instance(num_classes, pretrained=True):
     """
     This method gets an instance of FCN-Resnet-101 model given num_classes.
-    Model is pretrained on a subset of COCO train2017, on the 20 categories
-    that are present in the Pascal VOC dataset. Output layer of model
-    uses the first num_classes pretrained filters. 0 < num_classes <= 21
+     If pretrained, then the model is pretrained on a subset of COCO train2017,
+    on the 20 categories that are present in the Pascal VOC dataset. Output layer
+    of model uses the first num_classes pretrained filters. 0 < num_classes <= 21
 
     :param num_classes: number of classes
+    :param pretrained: loads pretrained model iff pretrained
     :return: instance of FCN-Resnet-101 model.
     """
 
@@ -94,6 +100,9 @@ def get_fcn_resnet101_model_instance(num_classes):
         raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
 
     model = fcn_resnet101(pretrained=False, num_classes=num_classes)
+
+    if not pretrained:
+        return model
 
     arch_type = 'fcn'
     backbone = 'resnet101'
@@ -117,6 +126,7 @@ def get_fcn_resnet101_model_instance(num_classes):
             else:
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
+    print('Loaded pretrained model.')
     return model
 
 
@@ -141,9 +151,9 @@ def main(args):
     print("Creating model")
     # Create the correct model type
     if args.model == 'fcn_resnet50':
-        model = get_fcn_resnet50_model_instance(num_classes)
+        model = get_fcn_resnet50_model_instance(num_classes, pretrained=args.pretrained)
     else:
-        model = get_fcn_resnet101_model_instance(num_classes)
+        model = get_fcn_resnet101_model_instance(num_classes, pretrained=args.pretrained)
 
     # Move model to the right device
     model.to(device)
@@ -193,6 +203,7 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', default='/home/nicolai/phd/data/cvppp_2019/apple_dataset', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--model', default='maskrcnn', help='model: fcn_resnet50, fcn_resnet101')
+    parser.add_argument('--pretrained', default='', help='loads pretrained model iff pretrained')
     parser.add_argument('--device', default='cuda', help='device')
     parser.add_argument('-b', '--batch-size', default=2, type=int)
     parser.add_argument('--epochs', default=13, type=int, metavar='N', help='number of total epochs to run')
