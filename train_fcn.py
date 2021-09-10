@@ -9,7 +9,7 @@ from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
 
 from data.apple_dataset import AppleDataset
-from utility.engine import train_one_epoch_fcn_resnet, evaluate
+from utility.engine import train_one_epoch_fcn_resnet, evaluate_fcn
 
 import utility.utils as utils
 import utility.transforms as T
@@ -28,6 +28,8 @@ model_urls = {
 
 def get_transform(train):
     transforms = []
+    transforms.append(T.CollapseMasks())
+    transforms.append(T.ToBinaryClasses())
     transforms.append(T.ToTensor())
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
@@ -171,7 +173,7 @@ def main(args):
             },  os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
         # evaluate after every epoch
-        evaluate(model, data_loader_test, device=device)
+        evaluate_fcn(model, data_loader_test, device=device)
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))

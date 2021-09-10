@@ -52,6 +52,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
         metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
+
 def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, print_freq):
     model.train()
     metric_logger = utils.MetricLogger(delimiter="  ")
@@ -153,3 +154,16 @@ def evaluate(model, data_loader, device):
     coco_evaluator.summarize()
     torch.set_num_threads(n_threads)
     return coco_evaluator
+
+
+def evaluate_fcn(model, data_loader, device):
+    """
+    This method evaluates FCN model model on dataset in data_loader using device device given
+    model, data_loader, and device. Evaluation computes and prints mean IoU.
+    :param model: FCN model
+    :param data_loader: data_loader
+    :param device: device to run evaluation
+    :return:
+    """
+
+    pass
