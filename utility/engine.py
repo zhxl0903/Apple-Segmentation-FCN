@@ -67,13 +67,6 @@ def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, pri
     # Defines softmax cross-entropy loss
     CE_Loss = CrossEntropyLoss()
 
-    lr_scheduler = None
-    if epoch == 0:
-        warmup_factor = 1. / 1000
-        warmup_iters = min(1000, len(data_loader) - 1)
-
-        lr_scheduler = utils.warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor)
-
     for images, targets in metric_logger.log_every(data_loader, print_freq, header):
         images = torch.stack(list(images), dim=0).to(device)
         targets = torch.stack([t["masks"] for t in targets], dim=0).long().to(device)
@@ -91,9 +84,6 @@ def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, pri
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
-        if lr_scheduler is not None:
-            lr_scheduler.step()
 
         metric_logger.update(loss=loss_value)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])

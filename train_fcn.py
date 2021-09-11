@@ -182,9 +182,14 @@ def main(args):
     print("Start training")
     start_time = time.time()
     for epoch in range(args.epochs):
+
+        # Trains model for one epoch
         train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, args.print_freq)
+
+        # Updates scheduler
         lr_scheduler.step()
 
+        # Saves model of epoch epoch
         if args.output_dir:
             torch.save({
                 'epoch': epoch,
@@ -193,7 +198,7 @@ def main(args):
                 'lr_scheduler': lr_scheduler.state_dict(),
             }, os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
-        # evaluate after every epoch
+        # evaluates model
         evaluate_fcn(model, data_loader_test, device=device, args=args, epoch=epoch)
 
     total_time = time.time() - start_time
