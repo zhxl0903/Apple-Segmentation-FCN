@@ -103,16 +103,18 @@ def main(args):
     # Predict on mask on each image
     with torch.no_grad():
         for image, targets in data_loader_test:
-            mask_name = basename(imgs[targets[0]['image_id'].item()])
-            print('Working on {}...'.format(mask_name))
+            im_id = targets[0]['image_id']
+            im_name = data_loader_test.dataset.get_img_name(im_id)
+
+            print('Working on {}...'.format(im_name))
 
             image = torch.stack(list(image), dim=0).to(device)
             output = model(image)
 
             # Saves mask
-            output = output[0].cpu().detach().numpy()
+            output = output[0].cpu().numpy()
             mask = (np.argmax(output, axis=0) * 255).astype(np.uint8)
-            imageio.imsave(join(base_path, mask_name), mask)
+            imageio.imsave(join(base_path, im_name), mask)
 
 
 if __name__ == "__main__":
