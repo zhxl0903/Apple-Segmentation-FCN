@@ -164,9 +164,9 @@ def main(args):
     data_loader = torch.utils.data.DataLoader(train, batch_size=args.batch_size, shuffle=True,
                                               num_workers=args.workers, collate_fn=utils.collate_fn)
 
-    data_loader_test = torch.utils.data.DataLoader(val, batch_size=1,
-                                                   shuffle=False, num_workers=args.workers,
-                                                   collate_fn=utils.collate_fn)
+    data_loader_val = torch.utils.data.DataLoader(val, batch_size=1,
+                                                  shuffle=False, num_workers=args.workers,
+                                                  collate_fn=utils.collate_fn)
 
     print("Creating model")
 
@@ -219,7 +219,7 @@ def main(args):
             }, os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
         # evaluates model
-        evaluate_fcn(model, data_loader_test, device=device, args=args, epoch=epoch)
+        evaluate_fcn(model, data_loader_val, device=device, args=args, epoch=epoch)
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))

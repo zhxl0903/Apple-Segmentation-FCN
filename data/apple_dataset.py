@@ -10,7 +10,19 @@ from PIL import Image
 # and extracts bounding boxes on the fly
 #####################################
 class AppleDataset(data.Dataset):
+    """
+    This class defines the Apple Dataset. Apple Dataset contains
+    image, bounding box positions, segmentation masks, image_id,
+    and bounding box areas.
+    """
     def __init__(self, root_dir, transforms=None):
+        """
+        This method initializes an instance of AppleDataset given dataset dir
+        root_dir and transforms.
+
+        :param root_dir: root dir of AppleDataset which contains images and masks dir
+        :param transforms: transforms on data
+        """
         self.root_dir = root_dir
         self.transforms = transforms
 
@@ -19,24 +31,25 @@ class AppleDataset(data.Dataset):
         self.masks = list(sorted(os.listdir(os.path.join(root_dir, "masks"))))
 
     def __getitem__(self, idx):
-        # Load images and masks
+
+        # Loads images and masks
         img_path = os.path.join(self.root_dir, "images", self.imgs[idx])
         mask_path = os.path.join(self.root_dir, "masks", self.masks[idx])
 
         img = Image.open(img_path).convert("RGB")
         mask = Image.open(mask_path)  # Each color of mask corresponds to a different instance with 0 being the background
 
-        # Convert the PIL image to np array
+        # Converts the PIL image to np array
         mask = np.array(mask)
         obj_ids = np.unique(mask)
 
-        # Remove background id
+        # Removes background id
         obj_ids = obj_ids[1:]
 
-        # Split the color-encoded masks into a set of binary masks
+        # Splits the color-encoded masks into a set of binary masks
         masks = mask == obj_ids[:, None, None]
 
-        # Get bbox coordinates for each mask
+        # Gets bbox coordinates for each mask
         num_objs = len(obj_ids)
         boxes = []
         h, w = mask.shape
@@ -56,7 +69,7 @@ class AppleDataset(data.Dataset):
             ymax = np.clip(ymax, a_min=0, a_max=h)
             boxes.append([xmin, ymin, xmax, ymax])
 
-        # Convert everything into a torch.Tensor
+        # Converts everything into a torch.Tensor
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
 
         # There is only one class (apples)
@@ -92,10 +105,16 @@ class AppleDataset(data.Dataset):
 class TransformDataset(torch.utils.data.Dataset):
     """
         Given a dataset, this class creates a dataset which applies a transform
-        to its data.
+        to the given dataset.
     """
 
-    def __init__(self, dataset, transforms):
+    def __init__(self, dataset, transforms=None):
+        """
+        This method initializes an instance of TransformDataset given dataset
+        and transforms.
+        :param dataset: dataset
+        :param transforms: transforms
+        """
         self.dataset = dataset
         self.transforms = transforms
 
