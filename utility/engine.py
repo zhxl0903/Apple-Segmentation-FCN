@@ -9,6 +9,10 @@ from utility.coco_utils import get_coco_api_from_dataset
 from utility.coco_eval import CocoEvaluator
 import utility.utils as utils
 from torch.nn import CrossEntropyLoss
+import numpy as np
+from sklearn.metrics import confusion_matrix
+from statistics import mean
+from segmentation_eval import computeMetrics
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
     model.train()
@@ -161,11 +165,49 @@ def evaluate_fcn(model, data_loader, device):
     :return:
     """
 
-    cpu_device = torch.device("cpu")
     model.eval()
-    metric_logger = utils.MetricLogger(delimiter="  ")
-    header = 'Test:'
+
+    mious = []
+    fious = []
+    mAcc = []
+    pAcc = []
+    ious = np.empty((0, 2))
+    mAccs = np.empty((0, 2))
+
     with torch.no_grad():
-        for image, targets in metric_logger.log_every(data_loader, 100, header):
-            pass
+        for image, targets in data_loader:
+            images = torch.stack(list(images), dim=0).to(device)
+            targets = torch.stack([t["masks"] for t in targets], dim=0).to(device)
+
+            # Gets prediction for image
+            pred = model(images)
+            pred = pred[0].cpu().detach().numpy()
+            pred = np.argmax(pred, axis=0).astype(np.uint8)
+
+            # Gets GT mask
+            gt_mask = targets[0].cpu().detach().numpy().astype(np.uint8)
+
+            # Computes different metrics
+            confusion = confusion_matrix(gt_mask.flatten(), pred.flatten())
+            miou, fwiou, macc, pacc, iou, maccs = computeMetrics(confusion)
+            mious.append(miou)
+            fious.append(fwiou)
+            mAcc.append(macc)
+            pAcc.append(pacc)
+            ious = np.vstack((ious, iou))
+            mAccs = np.vstack((mAccs, maccs))
+
+            # Prints results
+            print("Mean IoU: {}".format(mean(mious)))
+            print("Mean frequency weighted IoU: {}".format(mean(fious)))
+            print("Mean Accuracy: {}".format(mean(mAcc)))
+            print("Pixel Accuracy: {}".format(mean(pAcc)))
+            print("Class IoU: {}".format(np.mean(ious, axis=0)))
+            print("Class Mean Accuracy: {}".format(np.mean(mAccs, axis=0)))
+
+            # Writes results
+
+
+
+
 
