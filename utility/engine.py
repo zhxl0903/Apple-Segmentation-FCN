@@ -15,6 +15,7 @@ from statistics import mean
 from segmentation_eval import computeMetrics
 from os.path import *
 
+
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
     model.train()
     metric_logger = utils.MetricLogger(delimiter="  ")
@@ -209,5 +210,3 @@ def evaluate_fcn(model, data_loader, device, args, epoch):
                 f.write("Pixel Accuracy: {}\n".format(mean(pAcc)))
                 f.write("Class IoU: {}\n".format(np.mean(ious, axis=0)))
                 f.write("Class Mean Accuracy: {}\n".format(np.mean(mAccs, axis=0)))
-
-
