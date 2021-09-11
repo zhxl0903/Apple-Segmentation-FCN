@@ -15,6 +15,7 @@ class AppleDataset(data.Dataset):
     image, bounding box positions, segmentation masks, image_id,
     and bounding box areas.
     """
+
     def __init__(self, root_dir, transforms=None):
         """
         This method initializes an instance of AppleDataset given dataset dir
@@ -37,7 +38,17 @@ class AppleDataset(data.Dataset):
         mask_path = os.path.join(self.root_dir, "masks", self.masks[idx])
 
         img = Image.open(img_path).convert("RGB")
-        mask = Image.open(mask_path)  # Each color of mask corresponds to a different instance with 0 being the background
+
+        # Loads mask if mask exists
+        # Otherwise, a warning message is printed and np.array of ones is used as mask.
+        if os.path.exists(mask_path):
+
+            # Each color of mask corresponds to a different instance with 0 being the background
+            mask = Image.open(mask_path)
+        else:
+            print('Warning mask {} does not exist.'.format(mask_path))
+            print("A mask of ones will b e used to prepare groundtruth.")
+            mask = np.ones(img.shape[:2])
 
         # Converts the PIL image to np array
         mask = np.array(mask)
