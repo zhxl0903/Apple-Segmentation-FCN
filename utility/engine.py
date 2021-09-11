@@ -161,4 +161,11 @@ def evaluate_fcn(model, data_loader, device):
     :return:
     """
 
-    pass
+    cpu_device = torch.device("cpu")
+    model.eval()
+    metric_logger = utils.MetricLogger(delimiter="  ")
+    header = 'Test:'
+    with torch.no_grad():
+        for image, targets in metric_logger.log_every(data_loader, 100, header):
+            pass
+
