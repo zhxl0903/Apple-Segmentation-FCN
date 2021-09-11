@@ -101,17 +101,18 @@ def main(args):
         os.makedirs(base_path)
 
     # Predict on mask on each image
-    for image, targets in data_loader_test:
-        mask_name = basename(imgs[targets[0]['image_id'].item()])
-        print('Working on {}...'.format(mask_name))
+    with torch.no_grad():
+        for image, targets in data_loader_test:
+            mask_name = basename(imgs[targets[0]['image_id'].item()])
+            print('Working on {}...'.format(mask_name))
 
-        image = torch.stack(list(image), dim=0).to(device)
-        output = model(image)
+            image = torch.stack(list(image), dim=0).to(device)
+            output = model(image)
 
-        # Saves mask
-        output = output[0].cpu().detach().numpy()
-        mask = (np.argmax(output, axis=0) * 255).astype(np.uint8)
-        imageio.imsave(join(base_path, mask_name), mask)
+            # Saves mask
+            output = output[0].cpu().detach().numpy()
+            mask = (np.argmax(output, axis=0) * 255).astype(np.uint8)
+            imageio.imsave(join(base_path, mask_name), mask)
 
 
 if __name__ == "__main__":
