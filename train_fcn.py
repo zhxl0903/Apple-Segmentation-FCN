@@ -170,7 +170,7 @@ def main(args):
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_steps, gamma=args.lr_gamma)
 
     if args.resume:
-        checkpoint = torch.load(args.resume, map_location='cpu')
+        checkpoint = torch.load(args.resume_model_dir, map_location='cpu')
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
@@ -210,13 +210,13 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
-    parser.add_argument('--data_path', default='/home/nicolai/phd/data/cvppp_2019/apple_dataset', help='dataset')
+    parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/train', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--model', default='fcn_resnet50', help='model: fcn_resnet50, fcn_resnet101')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads pretrained model iff pretrained')
     parser.add_argument('--device', default='cuda', help='device')
     parser.add_argument('-b', '--batch-size', default=2, type=int)
-    parser.add_argument('--epochs', default=13, type=int, metavar='N', help='number of total epochs to run')
+    parser.add_argument('--epochs', default=16, type=int, metavar='N', help='number of total epochs to run')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 16)')
     parser.add_argument('--optim', default='adam', help='optimizer: adam, sgd')
     parser.add_argument('--lr', default=0.02, type=float, help='initial learning rate')
@@ -229,8 +229,9 @@ if __name__ == "__main__":
     parser.add_argument('--lr-steps', default=[8, 11], nargs='+', type=int, help='decrease lr every step-size epochs')
     parser.add_argument('--lr-gamma', default=0.1, type=float, help='decrease lr by a factor of lr-gamma')
     parser.add_argument('--print-freq', default=20, type=int, help='print frequency')
-    parser.add_argument('--output-dir', default='.', help='path where to save')
+    parser.add_argument('--output-dir', default='./models', help='path where to save')
     parser.add_argument('--resume', dest='resume', action='store_true', help='resume from checkpoint')
+    parser.add_argument('--resume_model_dir', default='', help='path of model to load to resume training')
 
     args = parser.parse_args()
     print(args.model)
