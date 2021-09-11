@@ -5,11 +5,15 @@ from os.path import *
 
 import torch
 import torch.utils.data
+from torch.utils.data import random_split
+
 import torchvision
 from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
+import numpy as np
+import random
 
-from data.apple_dataset import AppleDataset
+from data.apple_dataset import AppleDataset, TransformDataset
 from utility.engine import train_one_epoch_fcn_resnet, evaluate_fcn
 
 import utility.utils as utils
@@ -19,6 +23,11 @@ import utility.transforms as T
 # Train either a FCN-Resnet-50 or FCN-Resnet-101 predictor
 # using the MinneApple dataset
 ######################################################
+
+# For reproducibility
+torch.manual_seed(0)
+np.random.seed(0)
+random.seed(0)
 
 model_urls = {
     'fcn_resnet50_coco': 'https://download.pytorch.org/models/fcn_resnet50_coco-1167a1af.pth',
@@ -138,18 +147,29 @@ def main(args):
     # Data loading code
     print("Loading data")
     num_classes = 2
-    dataset = AppleDataset(os.path.join(args.data_path, 'train'), get_transform(train=True))
-    dataset_test = AppleDataset(os.path.join(args.data_path, 'test'), get_transform(train=False))
+
+    # Creates AppleDataset from train set
+    dataset = AppleDataset(os.path.join(args.data_path, 'train'), transforms=None)
+
+    # Splits train dataset into train, val set
+    data_len = len(dataset)
+    data_train_val_len = int(data_len * args.val_percent)
+    train, val = random_split(dataset, [data_len - data_train_val_len, data_train_val_len])
+
+    # Gets dataset with transforms
+    train = TransformDataset(train, transforms=get_transform(train=True))
+    val = TransformDataset(val, transforms=get_transform(train=False))
 
     print("Creating data loaders")
-    data_loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, shuffle=True,
+    data_loader = torch.utils.data.DataLoader(train, batch_size=args.batch_size, shuffle=True,
                                               num_workers=args.workers, collate_fn=utils.collate_fn)
 
-    data_loader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1,
+    data_loader_test = torch.utils.data.DataLoader(val, batch_size=1,
                                                    shuffle=False, num_workers=args.workers,
                                                    collate_fn=utils.collate_fn)
 
     print("Creating model")
+
     # Create the correct model type
     if args.model == 'fcn_resnet50':
         model = get_fcn_resnet50_model_instance(num_classes, pretrained=args.pretrained)
@@ -212,6 +232,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
     parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/train', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
+    parser.add_argument('--val_percent', default=0.1, type=float, metavar='V', help='percent of train set for validation split')
     parser.add_argument('--model', default='fcn_resnet50', help='model: fcn_resnet50, fcn_resnet101')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads pretrained model iff pretrained')
     parser.add_argument('--device', default='cuda', help='device')

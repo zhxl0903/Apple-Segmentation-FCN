@@ -1,14 +1,16 @@
 import os
 import numpy as np
 import torch
+import torch.utils.data as data
 from PIL import Image
+
 
 #####################################
 # Class that takes the input instance masks
 # and extracts bounding boxes on the fly
 #####################################
-class AppleDataset(object):
-    def __init__(self, root_dir, transforms):
+class AppleDataset(data.Dataset):
+    def __init__(self, root_dir, transforms=None):
         self.root_dir = root_dir
         self.transforms = transforms
 
@@ -22,7 +24,7 @@ class AppleDataset(object):
         mask_path = os.path.join(self.root_dir, "masks", self.masks[idx])
 
         img = Image.open(img_path).convert("RGB")
-        mask = Image.open(mask_path)     # Each color of mask corresponds to a different instance with 0 being the background
+        mask = Image.open(mask_path)  # Each color of mask corresponds to a different instance with 0 being the background
 
         # Convert the PIL image to np array
         mask = np.array(mask)
@@ -85,3 +87,23 @@ class AppleDataset(object):
 
     def get_img_name(self, idx):
         return self.imgs[idx]
+
+
+class TransformDataset(torch.utils.data.Dataset):
+    """
+        Given a dataset, this class creates a dataset which applies a transform
+        to its data.
+    """
+
+    def __init__(self, dataset, transforms):
+        self.dataset = dataset
+        self.transforms = transforms
+
+    def __getitem__(self, index):
+        if self.transforms is not None:
+            return self.transforms(self.dataset[index])
+        else:
+            return self.dataset[index]
+
+    def __len__(self):
+        return len(self.dataset)
