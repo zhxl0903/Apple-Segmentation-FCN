@@ -176,19 +176,24 @@ def main(args):
     else:
         model = get_fcn_resnet101_model_instance(num_classes, pretrained=args.pretrained)
 
-    # Move model to the right device
-    model.to(device)
+    # Moves model to the right device
+    model = model.to(device)
 
     params = [p for p in model.parameters() if p.requires_grad]
 
+    # Creates the correct optimizer
     if args.optim == 'adam':
         optimizer = torch.optim.Adam(params, lr=args.lr, betas=(args.beta1, args.beta2), eps=args.epsilon, weight_decay=args.weight_decay)
     else:
         optimizer = torch.optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
-    #  lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
-    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_steps, gamma=args.lr_gamma)
+    # Creates the correct learning rate scheduler
+    if args.scheduler == 'StepLR':
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
+    else:
+        lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_steps, gamma=args.lr_gamma)
 
+    # Loads model if args.resume
     if args.resume:
         checkpoint = torch.load(args.resume_model_dir, map_location='cpu')
         model.load_state_dict(checkpoint['model'])
@@ -218,9 +223,13 @@ def main(args):
                 'lr_scheduler': lr_scheduler.state_dict(),
             }, os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
-        # evaluates model
-        evaluate_fcn(model, data_loader_val, device=device, args=args, epoch=epoch)
+        # evaluates model on train set
+        evaluate_fcn(model, data_loader, device=device, args=args, epoch=epoch, dataset='Train')
 
+        # evaluates model on validation set
+        evaluate_fcn(model, data_loader_val, device=device, args=args, epoch=epoch, dataset='Val')
+
+    # Computes total time elapsed
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
@@ -245,9 +254,10 @@ if __name__ == "__main__":
     parser.add_argument('--beta2', default=0.999, type=float, metavar='b2', help='adam beta 2')
     parser.add_argument('--epsilon', default=1e-8, type=float, metavar='eps', help='adam epsilon for numerical stability')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='sgd momentum')
-    parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float, metavar='W', help='weight decay (default: 1e-4)', dest='weight_decay')
-    parser.add_argument('--lr-step-size', default=8, type=int, help='decrease lr every step-size epochs')
-    parser.add_argument('--lr-steps', default=[8, 11], nargs='+', type=int, help='decrease lr every step-size epochs')
+    parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float, metavar='W', help='weight decay', dest='weight_decay')
+    parser.add_argument('--scheduler', default='MultiStepLR', help='learning rate scheduler: StepLR, MultiStepLR')
+    parser.add_argument('--lr-step-size', default=8, type=int, help='decrease lr every step-size epochs for StepLR scheduler')
+    parser.add_argument('--lr-steps', default=[8, 11], nargs='+', type=int, help='decrease lr at epoch lr-steps for MultiStepLR scheduler')
     parser.add_argument('--lr-gamma', default=0.1, type=float, help='decrease lr by a factor of lr-gamma')
     parser.add_argument('--print-freq', default=20, type=int, help='print frequency')
     parser.add_argument('--output-dir', default='./models', help='path where to save')

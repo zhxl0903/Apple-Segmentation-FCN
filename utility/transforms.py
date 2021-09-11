@@ -73,7 +73,7 @@ class CollapseMasks(object):
 
 class ToBinaryClasses(object):
     """
-        This transform coverts binary masks to 2 masks for classes, background and object
+        This transform converts binary masks to 2 masks for classes, background and object
     """
 
     def __call__(self, image, target):

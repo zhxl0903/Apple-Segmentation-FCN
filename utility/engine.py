@@ -147,10 +147,10 @@ def evaluate(model, data_loader, device):
     return coco_evaluator
 
 
-def evaluate_fcn(model, data_loader, device, args, epoch):
+def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
     """
     This method evaluates FCN model model on dataset in data_loader using device device given
-    model, data_loader, device, args, and epoch. Evaluation computes, prints, and saves Mean IoU,
+    model, data_loader, device, args, epoch, and dataset. Evaluation computes, prints, and saves Mean IoU,
     Mean Frequency Weighted IoU, Mean Accuracy, Pixel Accuracy, Class IoU (Apple Class), and
     Class Mean Accuracy (Apple Class).
     :param model: FCN model
@@ -158,6 +158,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch):
     :param device: device to run evaluation
     :param args: argument dictionary
     :param epoch: current epoch
+    :param dataset: dataset (e.g. Train, Val)
     :return:
     """
 
@@ -172,6 +173,8 @@ def evaluate_fcn(model, data_loader, device, args, epoch):
 
     with torch.no_grad():
         for image, targets in data_loader:
+
+            # Prepares batch of images and masks
             images = torch.stack(list(image), dim=0).to(device)
             targets = torch.stack([t["masks"] for t in targets], dim=0).to(device)
 
@@ -194,7 +197,8 @@ def evaluate_fcn(model, data_loader, device, args, epoch):
             mAccs = np.vstack((mAccs, maccs))
 
             # Prints results
-            print("Epoch {}\n".format(epoch))
+            print("Epoch {}".format(epoch))
+            print("Dataset: {}".format(dataset))
             print("Mean IoU: {}".format(mean(mious)))
             print("Mean frequency weighted IoU: {}".format(mean(fious)))
             print("Mean Accuracy: {}".format(mean(mAcc)))
@@ -205,6 +209,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch):
             # Writes results
             with open(join(args.output_dir, 'train_results.txt'), 'a') as f:
                 f.write("Epoch {}\n".format(epoch))
+                f.write("Dataset: {}\n".format(dataset))
                 f.write("Mean IoU: {}\n".format(mean(mious)))
                 f.write("Mean Accuracy: {}\n".format(mean(mAcc)))
                 f.write("Pixel Accuracy: {}\n".format(mean(pAcc)))

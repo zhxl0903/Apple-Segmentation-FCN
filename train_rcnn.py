@@ -81,8 +81,8 @@ def main(args):
     else:
         model = get_frcnn_model_instance(num_classes)
 
-    # Move model to the right device
-    model.to(device)
+    # Moves model to the right device
+    model = model.to(device)
 
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
