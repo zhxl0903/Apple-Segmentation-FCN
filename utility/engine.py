@@ -13,6 +13,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 from statistics import mean
 from segmentation_eval import computeMetrics
+from os.path import *
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
     model.train()
@@ -155,13 +156,17 @@ def evaluate(model, data_loader, device):
     return coco_evaluator
 
 
-def evaluate_fcn(model, data_loader, device):
+def evaluate_fcn(model, data_loader, device, args, epoch):
     """
     This method evaluates FCN model model on dataset in data_loader using device device given
-    model, data_loader, and device. Evaluation computes and prints mean IoU.
+    model, data_loader, device, args, and epoch. Evaluation computes, prints, and saves Mean IoU,
+    Mean Frequency Weighted IoU, Mean Accuracy, Pixel Accuracy, Class IoU (Apple Class), and
+    Class Mean Accuracy (Apple Class).
     :param model: FCN model
     :param data_loader: data_loader
     :param device: device to run evaluation
+    :param args: argument dictionary
+    :param epoch: current epoch
     :return:
     """
 
@@ -176,16 +181,16 @@ def evaluate_fcn(model, data_loader, device):
 
     with torch.no_grad():
         for image, targets in data_loader:
-            images = torch.stack(list(images), dim=0).to(device)
+            images = torch.stack(list(image), dim=0).to(device)
             targets = torch.stack([t["masks"] for t in targets], dim=0).to(device)
 
             # Gets prediction for image
             pred = model(images)
-            pred = pred[0].cpu().detach().numpy()
-            pred = np.argmax(pred, axis=0).astype(np.uint8)
+            pred = pred[0].detach().cpu().numpy()
+            pred = np.argmax(pred, axis=0).astype(np.float32)
 
             # Gets GT mask
-            gt_mask = targets[0].cpu().detach().numpy().astype(np.uint8)
+            gt_mask = targets[0].detach().cpu().numpy().astype(np.float32)
 
             # Computes different metrics
             confusion = confusion_matrix(gt_mask.flatten(), pred.flatten())
@@ -198,6 +203,7 @@ def evaluate_fcn(model, data_loader, device):
             mAccs = np.vstack((mAccs, maccs))
 
             # Prints results
+            print("Epoch {}\n".format(epoch))
             print("Mean IoU: {}".format(mean(mious)))
             print("Mean frequency weighted IoU: {}".format(mean(fious)))
             print("Mean Accuracy: {}".format(mean(mAcc)))
@@ -206,8 +212,12 @@ def evaluate_fcn(model, data_loader, device):
             print("Class Mean Accuracy: {}".format(np.mean(mAccs, axis=0)))
 
             # Writes results
-
-
-
+            with open(join(args.output_dir, 'train_results.txt'), 'a') as f:
+                f.write("Epoch {}\n".format(epoch))
+                f.write("Mean IoU: {}\n".format(mean(mious)))
+                f.write("Mean Accuracy: {}\n".format(mean(mAcc)))
+                f.write("Pixel Accuracy: {}\n".format(mean(pAcc)))
+                f.write("Class IoU: {}\n".format(np.mean(ious, axis=0)))
+                f.write("Class Mean Accuracy: {}\n".format(np.mean(mAccs, axis=0)))
 
 

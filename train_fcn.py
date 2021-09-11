@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+from os.path import *
 
 import torch
 import torch.utils.data
@@ -174,6 +175,10 @@ def main(args):
         optimizer.load_state_dict(checkpoint['optimizer'])
         lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
 
+    # Clears train results file
+    with open(join(args.output_dir, 'train_results.txt'), 'w') as f:
+        f.write('')
+
     print("Start training")
     start_time = time.time()
     for epoch in range(args.epochs):
@@ -189,7 +194,7 @@ def main(args):
             }, os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
         # evaluate after every epoch
-        evaluate_fcn(model, data_loader_test, device=device)
+        evaluate_fcn(model, data_loader_test, device=device, args=args, epoch=epoch)
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
