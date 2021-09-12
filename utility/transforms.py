@@ -29,7 +29,7 @@ class RandomHorizontalFlip(object):
         self.prob = prob
 
     def __call__(self, image, target):
-        if random.random() < self.prob:
+        if random.random() < self.prob and "masks" in target and target["masks"] is not None:
             height, width = image.shape[-2:]
             image = image.flip(-1)
             bbox = target["boxes"]
@@ -41,6 +41,9 @@ class RandomHorizontalFlip(object):
                 keypoints = target["keypoints"]
                 keypoints = _flip_coco_person_keypoints(keypoints, width)
                 target["keypoints"] = keypoints
+        else:
+            image = image.flip(-1)
+
         return image, target
 
 
@@ -66,7 +69,7 @@ class CollapseMasks(object):
         :param target: target dictionary
         :return: target dictionary in which masks are collapsed to a binary mask using OR operation
         """
-        if "masks" in target:
+        if "masks" in target and target["masks"] is not None:
             target['masks'] = target["masks"].any(0, keepdim=self.keepdim)
         return image, target
 
@@ -84,6 +87,6 @@ class ToBinaryClasses(object):
         :return: target dictionary in which masks contain 2 masks
         """
 
-        if "masks" in target:
+        if "masks" in target and target["masks"] is not None:
             target["masks"] = torch.cat([(1 - target["masks"]).clone(), target["masks"].clone()], dim=0)
         return image, target
