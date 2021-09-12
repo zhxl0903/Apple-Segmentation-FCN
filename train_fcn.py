@@ -176,6 +176,9 @@ def main(args):
 
     print("Creating model")
 
+    # Creates output directory
+    os.makedirs(args.output_dir, exist_ok=True)
+
     # Create the correct model type
     if args.model == 'fcn_resnet50':
         model = get_fcn_resnet50_model_instance(num_classes, pretrained=args.pretrained)
@@ -185,6 +188,7 @@ def main(args):
     # Moves model to the right device
     model = model.to(device)
 
+    # Gets trainable params
     params = [p for p in model.parameters() if p.requires_grad]
 
     # Creates the correct optimizer

@@ -173,8 +173,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
     mAccs = np.empty((0, 2))
 
     with torch.no_grad():
-        for image, targets in data_loader:
-
+        for step, (image, targets) in enumerate(data_loader, 1):
             # Prepares batch of images and masks
             images = torch.stack(list(image), dim=0).to(device)
             targets = torch.stack([t["masks"] for t in targets], dim=0).to(device)
@@ -196,6 +195,12 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
             pAcc.append(pacc)
             ious = np.vstack((ious, iou))
             mAccs = np.vstack((mAccs, maccs))
+
+            # Prints results from metrics
+            print('Epoch: [{}]  [ {}/{}]  Mean IoU: {}  Mean frequency weighted IoU: {}  Mean Accuracy: {}  Pixel Accuracy: {}  Class IoU: {}  Class Mean Accuracy: {}'.format(epoch, step,
+                                                                                                                                                                               len(data_loader), miou,
+                                                                                                                                                                               fwiou, macc, pacc, iou,
+                                                                                                                                                                               maccs))
 
         # Prints results
         print("Epoch {}".format(epoch))

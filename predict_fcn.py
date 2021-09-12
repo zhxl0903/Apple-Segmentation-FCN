@@ -73,7 +73,7 @@ def main(args):
     num_classes = 2
     device = args.device
 
-    # Load the model from
+    # Loads the model from
     print("Loading model")
     # Create the correct model type
     if args.fcn_resnet50:
@@ -81,7 +81,7 @@ def main(args):
     else:
         model = get_fcn_resnet101_model_instance(num_classes)
 
-    # Load model parameters and keep on CPU
+    # Loads model parameters and keep on CPU
     checkpoint = torch.load(args.weight_file, map_location=device)
     model.load_state_dict(checkpoint['model'], strict=False)
     model.eval()
@@ -95,12 +95,12 @@ def main(args):
                                                    shuffle=False, num_workers=1,
                                                    collate_fn=utils.collate_fn)
 
-    # Create output directory
+    # Creates output directory
     base_path = os.path.dirname(args.output_path)
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
-    # Predict on mask on each image
+    # Predicts on mask on each image
     with torch.no_grad():
         for image, targets in data_loader_test:
             im_id = targets[0]['image_id']
