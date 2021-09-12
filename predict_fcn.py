@@ -22,7 +22,6 @@ from os.path import *
 
 def get_transform(train):
     transforms = []
-    transforms.append(T.CollapseMasks(keepdim=False))
     transforms.append(T.ToTensor())
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
@@ -121,9 +120,9 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='PyTorch Detection')
-    parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/test', help='path to the data to predict on')
-    parser.add_argument('--output_path', default='/home/zhang205/PycharmProjects/Apple-Segmentation-FCN/results', help='path where to write the prediction outputs')
-    parser.add_argument('--weight_file', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/train', help='path to the weight file')
+    parser.add_argument('--data_path', default='/media/zhng205/Datasets/Dataset/detection/test', help='path to the data to predict on')
+    parser.add_argument('--output_path', default='/home/zhng205/PycharmProjects/Apple-Segmentation-FCN/results', help='path where to write the prediction outputs')
+    parser.add_argument('--weight_file', default='/home/zhng205/PycharmProjects/Apple-Segmentation-FCN/models/model_11.pth', help='path to the weight file')
     parser.add_argument('--device', default='cuda', help='device to use. Either cpu or cuda')
     model = parser.add_mutually_exclusive_group(required=True)
     model.add_argument('--fcn_resnet50', action='store_true', help='use a FCN-Resnet-50 model')

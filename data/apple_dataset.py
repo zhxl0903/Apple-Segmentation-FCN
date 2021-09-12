@@ -55,51 +55,60 @@ class AppleDataset(data.Dataset):
             mask = Image.open(mask_path)
         else:
             print('Warning: mask {} does not exist.'.format(mask_path))
-            print("A mask of ones will be used to prepare groundtruth data.")
-            mask = np.ones(img.shape[:2])
+            mask = None
+            
+        if mask is not None:
+            # Converts the PIL image to np array
+            mask = np.array(mask)
+            obj_ids = np.unique(mask)
 
-        # Converts the PIL image to np array
-        mask = np.array(mask)
-        obj_ids = np.unique(mask)
+            # Removes background id
+            obj_ids = obj_ids[1:]
 
-        # Removes background id
-        obj_ids = obj_ids[1:]
+            # Splits the color-encoded masks into a set of binary masks
+            masks = mask == obj_ids[:, None, None]
 
-        # Splits the color-encoded masks into a set of binary masks
-        masks = mask == obj_ids[:, None, None]
+            # Gets bbox coordinates for each mask
+            num_objs = len(obj_ids)
+            boxes = []
+            h, w = mask.shape
+            for ii in range(num_objs):
+                pos = np.where(masks[ii])
+                xmin = np.min(pos[1])
+                xmax = np.max(pos[1])
+                ymin = np.min(pos[0])
+                ymax = np.max(pos[0])
 
-        # Gets bbox coordinates for each mask
-        num_objs = len(obj_ids)
-        boxes = []
-        h, w = mask.shape
-        for ii in range(num_objs):
-            pos = np.where(masks[ii])
-            xmin = np.min(pos[1])
-            xmax = np.max(pos[1])
-            ymin = np.min(pos[0])
-            ymax = np.max(pos[0])
+                if xmin == xmax or ymin == ymax:
+                    continue
 
-            if xmin == xmax or ymin == ymax:
-                continue
+                xmin = np.clip(xmin, a_min=0, a_max=w)
+                xmax = np.clip(xmax, a_min=0, a_max=w)
+                ymin = np.clip(ymin, a_min=0, a_max=h)
+                ymax = np.clip(ymax, a_min=0, a_max=h)
+                boxes.append([xmin, ymin, xmax, ymax])
 
-            xmin = np.clip(xmin, a_min=0, a_max=w)
-            xmax = np.clip(xmax, a_min=0, a_max=w)
-            ymin = np.clip(ymin, a_min=0, a_max=h)
-            ymax = np.clip(ymax, a_min=0, a_max=h)
-            boxes.append([xmin, ymin, xmax, ymax])
+            # Converts everything into a torch.Tensor
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
 
-        # Converts everything into a torch.Tensor
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            # There is only one class (apples)
+            labels = torch.ones((num_objs,), dtype=torch.int64)
+            masks = torch.as_tensor(masks, dtype=torch.uint8)
 
-        # There is only one class (apples)
-        labels = torch.ones((num_objs,), dtype=torch.int64)
-        masks = torch.as_tensor(masks, dtype=torch.uint8)
+
+            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+
+            # All instances are not crowd
+            iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+        else:
+            boxes = None
+            labels = None
+            masks = None
+            area = None
+            iscrowd = torch.zeros((0,), dtype=torch.int64)
 
         image_id = torch.tensor([idx])
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
 
-        # All instances are not crowd
-        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
 
         target = {}
         target["boxes"] = boxes

@@ -219,7 +219,6 @@ class MetricLogger(object):
 
 
 def collate_fn(batch):
-    print(batch)
     return tuple(zip(*batch))
 
 
