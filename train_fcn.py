@@ -267,7 +267,7 @@ if __name__ == "__main__":
     parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float, metavar='W', help='weight decay', dest='weight_decay')
     parser.add_argument('--scheduler', default='MultiStepLR', help='learning rate scheduler: StepLR, MultiStepLR')
     parser.add_argument('--lr-step-size', default=8, type=int, help='decrease lr every step-size epochs for StepLR scheduler')
-    parser.add_argument('--lr-steps', default=[8, 11], nargs='+', type=int, help='decrease lr at epoch lr-steps for MultiStepLR scheduler')
+    parser.add_argument('--lr-steps', default=[8, 12], nargs='+', type=int, help='decrease lr at epoch lr-steps for MultiStepLR scheduler')
     parser.add_argument('--lr-gamma', default=0.1, type=float, help='decrease lr by a factor of lr-gamma')
     parser.add_argument('--print-freq', default=1, type=int, help='print frequency')
     parser.add_argument('--output-dir', default='./models', help='path where to save')
