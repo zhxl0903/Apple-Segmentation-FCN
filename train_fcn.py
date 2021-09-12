@@ -245,7 +245,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
-    parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/train', help='dataset')
+    parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--val_percent', default=0.1, type=float, metavar='V', help='percent of train set for validation split')
     parser.add_argument('--model', default='fcn_resnet50', help='model: fcn_resnet50, fcn_resnet101')
