@@ -19,6 +19,8 @@ from utility.engine import train_one_epoch_fcn_resnet, evaluate_fcn
 import utility.utils as utils
 import utility.transforms as T
 
+from copy import deepcopy
+
 ######################################################
 # Train either a FCN-Resnet-50 or FCN-Resnet-101 predictor
 # using the MinneApple dataset
@@ -156,15 +158,19 @@ def main(args):
     data_train_val_len = int(data_len * args.val_percent)
     train, val = random_split(dataset, [data_len - data_train_val_len, data_train_val_len])
 
-    # Gets dataset with transforms
+    # Creates dataset with transforms
     train = TransformDataset(train, transforms=get_transform(train=True))
     val = TransformDataset(val, transforms=get_transform(train=False))
 
+    # Creates dataloaders
     print("Creating data loaders")
-    data_loader = torch.utils.data.DataLoader(train, batch_size=args.batch_size, shuffle=True,
+    data_loader_train = torch.utils.data.DataLoader(train, batch_size=args.batch_size, shuffle=True,
                                               num_workers=args.workers, collate_fn=utils.collate_fn)
 
-    data_loader_val = torch.utils.data.DataLoader(val, batch_size=1,
+    data_loader_train_eval = torch.utils.data.DataLoader(deepcopy(train), batch_size=1, shuffle=False,
+                                              num_workers=args.workers, collate_fn=utils.collate_fn)
+
+    data_loader_val_eval = torch.utils.data.DataLoader(val, batch_size=1,
                                                   shuffle=False, num_workers=args.workers,
                                                   collate_fn=utils.collate_fn)
 
@@ -209,7 +215,7 @@ def main(args):
     for epoch in range(args.epochs):
 
         # Trains model for one epoch
-        train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, args.print_freq)
+        train_one_epoch_fcn_resnet(model, optimizer, data_loader_train, device, epoch, args.print_freq)
 
         # Updates scheduler
         lr_scheduler.step()
@@ -224,10 +230,10 @@ def main(args):
             }, os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)), _use_new_zipfile_serialization=False)
 
         # evaluates model on train set
-        evaluate_fcn(model, data_loader, device=device, args=args, epoch=epoch, dataset='Train')
+        evaluate_fcn(model, data_loader_train_eval, device=device, args=args, epoch=epoch, dataset='Train')
 
         # evaluates model on validation set
-        evaluate_fcn(model, data_loader_val, device=device, args=args, epoch=epoch, dataset='Val')
+        evaluate_fcn(model, data_loader_val_eval, device=device, args=args, epoch=epoch, dataset='Val')
 
     # Computes total time elapsed
     total_time = time.time() - start_time
@@ -249,7 +255,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', default=16, type=int, metavar='N', help='number of total epochs to run')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 16)')
     parser.add_argument('--optim', default='adam', help='optimizer: adam, sgd')
-    parser.add_argument('--lr', default=0.02, type=float, help='initial learning rate')
+    parser.add_argument('--lr', default=1e-3, type=float, help='initial learning rate')
     parser.add_argument('--beta1', default=0.9, type=float, metavar='b1', help='adam beta 1')
     parser.add_argument('--beta2', default=0.999, type=float, metavar='b2', help='adam beta 2')
     parser.add_argument('--epsilon', default=1e-8, type=float, metavar='eps', help='adam epsilon for numerical stability')
@@ -259,7 +265,7 @@ if __name__ == "__main__":
     parser.add_argument('--lr-step-size', default=8, type=int, help='decrease lr every step-size epochs for StepLR scheduler')
     parser.add_argument('--lr-steps', default=[8, 11], nargs='+', type=int, help='decrease lr at epoch lr-steps for MultiStepLR scheduler')
     parser.add_argument('--lr-gamma', default=0.1, type=float, help='decrease lr by a factor of lr-gamma')
-    parser.add_argument('--print-freq', default=20, type=int, help='print frequency')
+    parser.add_argument('--print-freq', default=1, type=int, help='print frequency')
     parser.add_argument('--output-dir', default='./models', help='path where to save')
     parser.add_argument('--resume', dest='resume', action='store_true', help='resume from checkpoint')
     parser.add_argument('--resume_model_dir', default='', help='path of model to load to resume training')

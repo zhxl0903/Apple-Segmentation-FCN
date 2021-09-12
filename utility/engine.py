@@ -163,6 +163,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
     """
 
     model.eval()
+    print('Evaluating on {} dataset...'.format(dataset))
 
     mious = []
     fious = []
@@ -196,22 +197,22 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
             ious = np.vstack((ious, iou))
             mAccs = np.vstack((mAccs, maccs))
 
-            # Prints results
-            print("Epoch {}".format(epoch))
-            print("Dataset: {}".format(dataset))
-            print("Mean IoU: {}".format(mean(mious)))
-            print("Mean frequency weighted IoU: {}".format(mean(fious)))
-            print("Mean Accuracy: {}".format(mean(mAcc)))
-            print("Pixel Accuracy: {}".format(mean(pAcc)))
-            print("Class IoU: {}".format(np.mean(ious, axis=0)))
-            print("Class Mean Accuracy: {}".format(np.mean(mAccs, axis=0)))
+        # Prints results
+        print("Epoch {}".format(epoch))
+        print("Dataset: {}".format(dataset))
+        print("Mean IoU: {}".format(mean(mious)))
+        print("Mean frequency weighted IoU: {}".format(mean(fious)))
+        print("Mean Accuracy: {}".format(mean(mAcc)))
+        print("Pixel Accuracy: {}".format(mean(pAcc)))
+        print("Class IoU: {}".format(np.mean(ious, axis=0)))
+        print("Class Mean Accuracy: {}".format(np.mean(mAccs, axis=0)))
 
-            # Writes results
-            with open(join(args.output_dir, 'train_results.txt'), 'a') as f:
-                f.write("Epoch {}\n".format(epoch))
-                f.write("Dataset: {}\n".format(dataset))
-                f.write("Mean IoU: {}\n".format(mean(mious)))
-                f.write("Mean Accuracy: {}\n".format(mean(mAcc)))
-                f.write("Pixel Accuracy: {}\n".format(mean(pAcc)))
-                f.write("Class IoU: {}\n".format(np.mean(ious, axis=0)))
-                f.write("Class Mean Accuracy: {}\n".format(np.mean(mAccs, axis=0)))
+        # Writes results
+        with open(join(args.output_dir, 'train_results.txt'), 'a') as f:
+            f.write("Epoch {}\n".format(epoch))
+            f.write("Dataset: {}\n".format(dataset))
+            f.write("Mean IoU: {}\n".format(mean(mious)))
+            f.write("Mean Accuracy: {}\n".format(mean(mAcc)))
+            f.write("Pixel Accuracy: {}\n".format(mean(pAcc)))
+            f.write("Class IoU: {}\n".format(np.mean(ious, axis=0)))
+            f.write("Class Mean Accuracy: {}\n".format(np.mean(mAccs, axis=0)))

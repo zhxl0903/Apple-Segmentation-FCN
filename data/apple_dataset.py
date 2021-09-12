@@ -46,8 +46,8 @@ class AppleDataset(data.Dataset):
             # Each color of mask corresponds to a different instance with 0 being the background
             mask = Image.open(mask_path)
         else:
-            print('Warning mask {} does not exist.'.format(mask_path))
-            print("A mask of ones will b e used to prepare groundtruth.")
+            print('Warning: mask {} does not exist.'.format(mask_path))
+            print("A mask of ones will be used to prepare groundtruth data.")
             mask = np.ones(img.shape[:2])
 
         # Converts the PIL image to np array
