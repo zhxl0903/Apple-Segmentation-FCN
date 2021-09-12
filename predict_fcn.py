@@ -95,7 +95,7 @@ def main(args):
                                                    collate_fn=utils.collate_fn)
 
     # Creates output directory
-    base_path = os.path.dirname(args.output_path)
+    base_path = args.output_path
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
