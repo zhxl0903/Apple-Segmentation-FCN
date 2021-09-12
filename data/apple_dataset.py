@@ -131,7 +131,7 @@ class TransformDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         if self.transforms is not None:
-            return self.transforms(self.dataset[index])
+            return self.transforms(*self.dataset[index])
         else:
             return self.dataset[index]
 
