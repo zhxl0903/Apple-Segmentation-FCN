@@ -73,22 +73,22 @@ def main(args):
     num_classes = 2
     device = args.device
 
-    # Loads the model from
-    print("Loading model")
-    # Create the correct model type
+    print("Creating model")
+
+    # Creates the correct model type
     if args.fcn_resnet50:
         model = get_fcn_resnet50_model_instance(num_classes)
     else:
         model = get_fcn_resnet101_model_instance(num_classes)
 
-    # Loads model parameters and keep on CPU
+    model = model.to(args.device)
+
+    # Loads model parameters
     checkpoint = torch.load(args.weight_file, map_location=device)
     model.load_state_dict(checkpoint['model'], strict=False)
     model.eval()
 
-    # Gets list of image dirs
-    imgs = list(sorted(os.listdir(os.path.join(args.data_path, "images"))))
-
+    # Creates dataloaders
     print("Creating data loaders")
     dataset_test = AppleDataset(args.data_path, get_transform(train=False))
     data_loader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1,
