@@ -249,13 +249,13 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
-    parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection/', help='dataset')
+    parser.add_argument('--data_path', default='/media/zhng205/Datasets/Dataset/detection', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--val_percent', default=0.1, type=float, metavar='V', help='percent of train set for validation split')
-    parser.add_argument('--model', default='fcn_resnet50', help='model: fcn_resnet50, fcn_resnet101')
+    parser.add_argument('--model', default='fcn_resnet101', help='model: fcn_resnet50, fcn_resnet101')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads pretrained model iff pretrained')
     parser.add_argument('--device', default='cuda', help='device')
-    parser.add_argument('-b', '--batch-size', default=1, type=int)
+    parser.add_argument('-b', '--batch-size', default=3, type=int)
     parser.add_argument('--epochs', default=16, type=int, metavar='N', help='number of total epochs to run')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 16)')
     parser.add_argument('--optim', default='adam', help='optimizer: adam, sgd')
