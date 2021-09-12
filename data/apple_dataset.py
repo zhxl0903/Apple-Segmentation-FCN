@@ -29,13 +29,21 @@ class AppleDataset(data.Dataset):
 
         # Load all image and mask files, sorting them to ensure they are aligned
         self.imgs = list(sorted(os.listdir(os.path.join(root_dir, "images"))))
-        self.masks = list(sorted(os.listdir(os.path.join(root_dir, "masks"))))
+
+        if os.path.exists(os.path.join(root_dir, "masks")):
+            self.masks = list(sorted(os.listdir(os.path.join(root_dir, "masks"))))
+        else:
+            self.masks = []
 
     def __getitem__(self, idx):
 
         # Loads images and masks
         img_path = os.path.join(self.root_dir, "images", self.imgs[idx])
-        mask_path = os.path.join(self.root_dir, "masks", self.masks[idx])
+
+        if self.masks:
+            mask_path = os.path.join(self.root_dir, "masks", self.masks[idx])
+        else:
+            mask_path = ''
 
         img = Image.open(img_path).convert("RGB")
 
