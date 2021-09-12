@@ -73,7 +73,7 @@ def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, pri
         targets = torch.stack([t["masks"] for t in targets], dim=0).long().to(device)
 
         # Output is the responses before applying softmax activation
-        output = model(images)
+        output = model(images)['out']
 
         loss = CE_Loss(output, targets)
         loss_value = loss.item()
@@ -180,7 +180,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
             targets = torch.stack([t["masks"] for t in targets], dim=0).to(device)
 
             # Gets prediction for image
-            pred = model(images)
+            pred = model(images)['out']
             pred = pred[0].detach().cpu().numpy()
             pred = np.argmax(pred, axis=0).astype(np.float32)
 

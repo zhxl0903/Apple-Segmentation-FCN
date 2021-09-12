@@ -109,7 +109,7 @@ def main(args):
             print('Working on {}...'.format(im_name))
 
             image = torch.stack(list(image), dim=0).to(device)
-            output = model(image)
+            output = model(image)['out']
 
             # Saves mask
             output = output[0].cpu().numpy()
