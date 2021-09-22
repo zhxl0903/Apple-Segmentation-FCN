@@ -217,6 +217,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
             f.write("Epoch {}\n".format(epoch))
             f.write("Dataset: {}\n".format(dataset))
             f.write("Mean IoU: {}\n".format(mean(mious)))
+            f.write("Mean frequency weighted IoU: {}\n".format(mean(fious)))
             f.write("Mean Accuracy: {}\n".format(mean(mAcc)))
             f.write("Pixel Accuracy: {}\n".format(mean(pAcc)))
             f.write("Class IoU: {}\n".format(np.mean(ious, axis=0)))
