@@ -21,6 +21,13 @@ from os.path import *
 ######################################################
 
 def get_transform(train):
+    """
+    This method gets the transforms to the dataset as a Compose instance given train.
+    Training data transforms are added to Compose instance iff train.
+
+    :param train: train transforms are added to Compose instance iff train
+    :return: Compose instance containing transforms
+    """
     transforms = []
     transforms.append(T.ToTensor())
     if train:

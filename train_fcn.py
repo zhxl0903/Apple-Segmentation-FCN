@@ -31,6 +31,7 @@ torch.manual_seed(0)
 np.random.seed(0)
 random.seed(0)
 
+# Defines URLs of different pretrained models
 model_urls = {
     'fcn_resnet50_coco': 'https://download.pytorch.org/models/fcn_resnet50_coco-1167a1af.pth',
     'fcn_resnet101_coco': 'https://download.pytorch.org/models/fcn_resnet101_coco-7ecb50ca.pth',
@@ -40,6 +41,13 @@ model_urls = {
 
 
 def get_transform(train):
+    """
+    This method gets the transforms to the dataset as a Compose instance given train.
+    Training data transforms are added to Compose instance iff train.
+
+    :param train: train transforms are added to Compose instance iff train
+    :return: Compose instance containing transforms
+    """
     transforms = []
     transforms.append(T.CollapseMasks(keepdim=False))
     transforms.append(T.ToTensor())
