@@ -46,6 +46,11 @@ python predict_fcn.py --data_path /path/to/MinneApple/dataset --output_path /pat
 python predict_fcn.py --data_path /path/to/MinneApple/dataset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --fcn_resnet101
 ```
 
+## Evaluation on MinneApple Test Set
+Evaluation of network on test set of MinneApple dataset can be performed on the codalab competition [fruit segmentation](https://competitions.codalab.org/competitions/21694).
+
+Submit outputs from predict_fcn.py on test set in a zipfile, results.zip, to the codelab competition.
+
 ## References
 
 ```
