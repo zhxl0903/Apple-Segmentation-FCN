@@ -60,6 +60,18 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
 
 
 def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, print_freq):
+    """
+    This method trains FCN_Resnet model for an epoch given FCN model model, optimizer optimizer,
+    data_loader data_loader, device device, epoch epoch, and print frequency print_freq.
+
+    :param model: FCN model
+    :param optimizer: optimizer
+    :param device: device to run training
+    :param epoch: current epoch
+    :param print_freq: frequency to print updates from logger
+    :return:
+    """
+
     model.train()
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
@@ -197,10 +209,12 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
             mAccs = np.vstack((mAccs, maccs))
 
             # Prints results from metrics
-            print('Epoch: [{}]  [ {}/{}]  Mean IoU: {}  Mean frequency weighted IoU: {}  Mean Accuracy: {}  Pixel Accuracy: {}  Class IoU: {}  Class Mean Accuracy: {}'.format(epoch, step,
-                                                                                                                                                                               len(data_loader), miou,
-                                                                                                                                                                               fwiou, macc, pacc, iou,
-                                                                                                                                                                               maccs))
+            print(
+                'Epoch: [{}]  [ {}/{}]  Mean IoU: {}  Mean frequency weighted IoU: {}  Mean Accuracy: {}  Pixel Accuracy: {}  Class IoU: {}  Class Mean Accuracy: {}'.format(
+                    epoch, step,
+                    len(data_loader), miou,
+                    fwiou, macc, pacc, iou,
+                    maccs))
 
         # Prints results
         print("Epoch {}".format(epoch))
