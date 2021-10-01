@@ -7,10 +7,10 @@ Here are the results on Apple Segmentation task.
 ### Apple Segmentation
 | Method | Backbone | IoU | Class IoU (Apple) |  Pixel Accuracy | Class Accuracy (Apple) |
 |---|---|---|---|---|---|
-| FCN-ResNet50  |  ResNet50  |  0.635 | 0.341 | 0.968  | 0.455  | 
-| FCN-ResNet101  |  ResNet101  |  0.649 |  0.455 | 0.959  | 0.634  | 
+| FCN-ResNet50 (COCO pretraining)  |  ResNet50  |  0.635 | 0.341 | 0.968  | 0.455  | 
+| FCN-ResNet101 (COCO pretraining) |  ResNet101  |  0.649 |  0.455 | 0.959  | 0.634  | 
 | FCN-ResNet50 (no pretraining)  | ResNet50  | 0.678  |  0.397 | 0.960  | 0.818  | 
-| FCN-ResNet101 (ImageNet pretraining)  | ResNet101  | 0.685  |  0.410 | 0.962  | 0.848  | 
+| FCN-ResNet101 (no pretraining)  | ResNet101  | 0.685  |  0.410 | 0.962  | 0.848  | 
 
 ## Installation
 * Setup a Python 3 environment
@@ -28,7 +28,7 @@ cd Apple-Segmentation-FCN
 
 ## Training
 To train a FCN model on the MinneApple dataset, download the dataset first from [here](https://conservancy.umn.edu/handle/11299/206575).
-* Now you can train a FCN-ResNet50 or FCN-ResNet101 network with the commands below.
+* Now, you can train a FCN-ResNet50 or FCN-ResNet101 network with the following commands.
 ```
 # Train FCN-ResNet50
 python train_fcn.py --data_path /path/to/MinneApple/dataset --model fcn_resnet50 --epochs 64 --output-dir /path/to/checkpoint/directory
