@@ -7,10 +7,10 @@ Here are the results on Apple Segmentation task.
 ### Apple Segmentation
 | Method | Backbone | IoU | Class IoU (Apple) |  Pixel Accuracy | Class Accuracy (Apple) |
 |---|---|---|---|---|---|
-| FCN-ResNet50 (COCO pretraining)  |  ResNet50  |  0.635 | 0.341 | 0.968  | 0.455  | 
-| FCN-ResNet101 (COCO pretraining) |  ResNet101  |  0.649 |  0.455 | 0.959  | 0.634  | 
-| FCN-ResNet50 (no pretraining)  | ResNet50  | 0.678  |  0.397 | 0.960  | 0.818  | 
-| FCN-ResNet101 (no pretraining)  | ResNet101  | 0.685  |  0.410 | 0.962  | 0.848  | 
+| FCN-ResNet50 (COCO pretraining)  |  ResNet50  |  0.811 | 0.636 | 0.986  | 0.839  | 
+| FCN-ResNet101 (COCO pretraining) |  ResNet101  |  0.808 |  0.630 | 0.986  | 0.835  | 
+| FCN-ResNet50 (no pretraining)  | ResNet50  | 0.815  |  0.644 | 0.987  | 0.844  | 
+| FCN-ResNet101 (no pretraining)  | ResNet101  | 0.806  |  0.628 | 0.985  | 0.842  | 
 
 ## Installation
 * Setup a Python 3 environment
