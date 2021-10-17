@@ -5,6 +5,12 @@ from torchvision.transforms import functional as F
 
 
 def _flip_coco_person_keypoints(kps, width):
+    """
+    This method flips keypoints kps horizontally given keypoints kps and width of image width.
+    :param kps: image
+    :param width: width of image
+    :return: flipped keypoints
+    """
     flip_inds = [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
     flipped_data = kps[:, flip_inds]
     flipped_data[..., 0] = width - flipped_data[..., 0]
