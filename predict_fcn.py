@@ -15,10 +15,10 @@ import imageio
 from os.path import *
 
 
-######################################################
+#################################################################
 # Predict with either a FCN-Resnet-50 or FCN-Resnet-101 predictor
 # using the MinneApple dataset
-######################################################
+################################################################
 
 def get_transform(train):
     """
