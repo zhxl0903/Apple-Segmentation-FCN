@@ -16,7 +16,7 @@ import numpy as np
 import random
 
 from data.apple_dataset import AppleDataset, TransformDataset
-from utility.engine import train_one_epoch_fcn_resnet, evaluate_fcn
+from utility.engine import train_one_epoch_fcn, evaluate_fcn
 
 import utility.utils as utils
 import utility.transforms as T
@@ -279,7 +279,7 @@ def main(args):
     # Creates dataloaders
     print("Creating data loaders")
     data_loader_train = torch.utils.data.DataLoader(train, batch_size=args.batch_size, shuffle=True,
-                                                    num_workers=args.workers, collate_fn=utils.collate_fn)
+                                                    num_workers=args.workers, collate_fn=utils.collate_fn, drop_last=args.drop_last_batch)
 
     data_loader_train_eval = torch.utils.data.DataLoader(deepcopy(train), batch_size=1, shuffle=False,
                                                          num_workers=args.workers, collate_fn=utils.collate_fn)
@@ -296,8 +296,12 @@ def main(args):
     # Create the correct model type
     if args.model == 'fcn_resnet50':
         model = get_fcn_resnet50_model_instance(num_classes, pretrained=args.pretrained)
-    else:
+    elif args.model == 'fcn_resnet101':
         model = get_fcn_resnet101_model_instance(num_classes, pretrained=args.pretrained)
+    elif args.model == 'deeplabv3_resnet50':
+        model = get_deeplabv3_resnet50_model_instance(num_classes, pretrained=args.pretrained)
+    else:
+        model = get_deeplabv3_resnet101_model_instance(num_classes, pretrained=args.pretrained)
 
     # Moves model to the right device
     model = model.to(device)
@@ -333,7 +337,7 @@ def main(args):
     for epoch in range(args.epochs):
 
         # Trains model for one epoch
-        train_one_epoch_fcn_resnet(model, optimizer, data_loader_train, device, epoch, args.print_freq)
+        train_one_epoch_fcn(model, optimizer, data_loader_train, device, epoch, args.print_freq)
 
         # Updates scheduler
         lr_scheduler.step()
@@ -363,13 +367,15 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
-    parser.add_argument('--data_path', default='/media/zhng205/Datasets/Dataset/detection', help='dataset')
+    parser.add_argument('--data_path', default='/media/zhang205/Datasets1/Datasets/MinneApple/detection', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--val_percent', default=0.1, type=float, metavar='V', help='percent of train set for validation split')
-    parser.add_argument('--model', default='fcn_resnet101', help='model: fcn_resnet50, fcn_resnet101')
+    parser.add_argument('--model', default='deeplabv3_resnet101', help='model: fcn_resnet50, fcn_resnet101, deeplabv3_resnet50, deeplabv3_resnet101')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads pretrained model iff pretrained')
     parser.add_argument('--device', default='cuda', help='device')
-    parser.add_argument('-b', '--batch-size', default=3, type=int)
+    parser.add_argument('-b', '--batch-size', default=1, type=int)
+    parser.add_argument('--drop_last_batch', dest='drop_last_batch', action='store_true',
+                        help='drops last incomplete mini-batch during training iff drop_last_batch')
     parser.add_argument('--epochs', default=16, type=int, metavar='N', help='number of total epochs to run')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 16)')
     parser.add_argument('--optim', default='adam', help='optimizer: adam, sgd')
@@ -390,7 +396,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(args.model)
-    assert (args.model in ['fcn_resnet50', 'fcn_resnet101'])
+    assert (args.model in ['fcn_resnet50', 'fcn_resnet101', 'deeplabv3_resnet50', 'deeplabv3_resnet101'])
 
     if args.output_dir:
         utils.mkdir(args.output_dir)

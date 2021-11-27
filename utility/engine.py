@@ -12,9 +12,9 @@ import utility.utils as utils
 from segmentation_eval import computeMetrics
 
 
-def train_one_epoch_fcn_resnet(model, optimizer, data_loader, device, epoch, print_freq):
+def train_one_epoch_fcn(model, optimizer, data_loader, device, epoch, print_freq):
     """
-    This method trains FCN_Resnet model for an epoch given FCN model model, optimizer optimizer,
+    This method trains FCN model for an epoch given FCN model model, optimizer optimizer,
     data_loader data_loader, device device, epoch epoch, and print frequency print_freq.
 
     :param model: FCN model
@@ -82,6 +82,7 @@ def evaluate_fcn(model, data_loader, device, args, epoch, dataset='Train'):
 
     with torch.no_grad():
         for step, (image, targets) in enumerate(data_loader, 1):
+
             # Prepares batch of images and masks
             images = torch.stack(list(image), dim=0).to(device)
             targets = torch.stack([t["masks"] for t in targets], dim=0).to(device)
