@@ -61,9 +61,11 @@ def get_transform(train):
 def get_fcn_resnet50_model_instance(num_classes, pretrained=True):
     """
     This method gets an instance of FCN-Resnet-50 model given num_classes, pretrained.
-    If pretrained, then the model is pretrained on a subset of COCO train2017, on the
-    20 categories that are present in the Pascal VOC dataset. Output layer of model
-    uses the first num_classes pretrained filters. 0 < num_classes <= 21
+    If not pretrained, then the resnet backbone is pretrained on ImageNet and the fcn
+    classifier head is randomly initialized. If pretrained, then the model is pretrained on
+    a subset of COCO train2017, on the 20 categories that are present in the Pascal
+    VOC dataset. Output layer of model uses the first num_classes pretrained filters.
+    0 < num_classes <= 21
 
     :param num_classes: number of classes
     :param pretrained: loads pretrained model iff pretrained
@@ -108,9 +110,11 @@ def get_fcn_resnet50_model_instance(num_classes, pretrained=True):
 def get_fcn_resnet101_model_instance(num_classes, pretrained=True):
     """
     This method gets an instance of FCN-Resnet-101 model given num_classes.
-     If pretrained, then the model is pretrained on a subset of COCO train2017,
-    on the 20 categories that are present in the Pascal VOC dataset. Output layer
-    of model uses the first num_classes pretrained filters. 0 < num_classes <= 21
+    If not pretrained, then the resnet backbone is pretrained on ImageNet and the fcn
+    classifier head is randomly initialized. If pretrained, then the model is pretrained on a
+    subset of COCO train2017, on the 20 categories that are present in the Pascal
+    VOC dataset. Output layer of model uses the first num_classes pretrained filters.
+    0 < num_classes <= 21
 
     :param num_classes: number of classes
     :param pretrained: loads pretrained model iff pretrained
@@ -155,9 +159,11 @@ def get_fcn_resnet101_model_instance(num_classes, pretrained=True):
 def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True):
     """
         This method gets an instance of DeepLabV3-Resnet-50 model given num_classes.
-        If pretrained, then the model is pretrained on a subset of COCO train2017,
-        on the 20 categories that are present in the Pascal VOC dataset. Output layer
-        of model uses the first num_classes pretrained filters. 0 < num_classes <= 21
+        If not pretrained, then the resnet backbone is pretrained on ImageNet and the deeplabv3
+        classifier head is randomly initialized. If pretrained, then the model is pretrained on
+        a subset of COCO train2017, on the 20 categories that are present in the
+        Pascal VOC dataset. Output layer of model uses the first num_classes
+        pretrained filters. 0 < num_classes <= 21
 
         :param num_classes: number of classes
         :param pretrained: loads pretrained model iff pretrained
@@ -203,9 +209,11 @@ def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True):
 def get_deeplabv3_resnet101_model_instance(num_classes, pretrained=True):
     """
         This method gets an instance of DeepLabV3-Resnet-101 model given num_classes.
-        If pretrained, then the model is pretrained on a subset of COCO train2017,
-        on the 20 categories that are present in the Pascal VOC dataset. Output layer
-        of model uses the first num_classes pretrained filters. 0 < num_classes <= 21
+        If not pretrained, then the resnet backbone is pretrained on ImageNet
+        and the deeplabv3 classifier head is randomly initialized. If pretrained, then the
+        model is pretrained on a subset of COCO train2017, on the 20 categories
+        that are present in the Pascal VOC dataset. Output layer of model uses
+        the first num_classes pretrained filters. 0 < num_classes <= 21
 
         :param num_classes: number of classes
         :param pretrained: loads pretrained model iff pretrained

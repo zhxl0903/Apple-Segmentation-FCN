@@ -7,9 +7,9 @@ Here are the results on Apple Segmentation task.
 ### Apple Segmentation
 | Method | Backbone | IoU | Class IoU (Apple) |  Pixel Accuracy | Class Accuracy (Apple) |
 |---|---|---|---|---|---|
-| FCN-ResNet50 (no pretraining)  | ResNet50  | 0.815  |  0.644 | 0.987  | 0.844  | 
+| FCN-ResNet50 (ImageNet pretraining for ResNet backbone)  | ResNet50  | 0.815  |  0.644 | 0.987  | 0.844  | 
 | FCN-ResNet50 (COCO pretraining)  |  ResNet50  |  0.811 | 0.636 | 0.986  | 0.839  | 
-| FCN-ResNet101 (no pretraining)  | ResNet101  | 0.806  |  0.628 | 0.985  | 0.842  | 
+| FCN-ResNet101 (ImageNet pretraining for ResNet backbone)  | ResNet101  | 0.806  |  0.628 | 0.985  | 0.842  | 
 | FCN-ResNet101 (COCO pretraining) |  ResNet101  |  0.808 |  0.630 | 0.986  | 0.835  |
 | Semi-supervised GMM  |  -  |  0.635 | 0.341 | 0.968  | 0.455  | 
 | User-supervised GMM  |  -  |  0.649 |  0.455 | 0.959  | 0.634  | 
