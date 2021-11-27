@@ -196,12 +196,15 @@ def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True):
         # gets state dict of model
         state_dict_self = model.state_dict()
         for i, (name, param) in enumerate(state_dict_self.items()):
+
+            # print('Before: ', name, state_dict_self[name])
             if name in ['classifier.4.weight', 'classifier.4.bias']:
                 state_dict_self[name].copy_(state_dict[name][:num_classes])
                 # print(torch.all(model.state_dict()[name] == state_dict[name][:num_classes]))
             else:
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
+            # print('After: ', name, state_dict_self[name])
     print('Loaded pretrained model.')
     return model
 
@@ -246,12 +249,15 @@ def get_deeplabv3_resnet101_model_instance(num_classes, pretrained=True):
         # gets state dict of model
         state_dict_self = model.state_dict()
         for i, (name, param) in enumerate(state_dict_self.items()):
+
+            # print('Before: ', name, state_dict_self[name])
             if name in ['classifier.4.weight', 'classifier.4.bias']:
                 state_dict_self[name].copy_(state_dict[name][:num_classes])
                 # print(torch.all(model.state_dict()[name] == state_dict[name][:num_classes]))
             else:
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
+            # print('After: ', name, state_dict_self[name])
     print('Loaded pretrained model.')
     return model
 
