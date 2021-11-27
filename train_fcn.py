@@ -10,6 +10,8 @@ from torch.utils.data import random_split
 import torchvision
 from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
+from torchvision.models.segmentation import deeplabv3_resnet50
+from torchvision.models.segmentation import deeplabv3_resnet101
 import numpy as np
 import random
 
@@ -150,6 +152,102 @@ def get_fcn_resnet101_model_instance(num_classes, pretrained=True):
     return model
 
 
+def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True):
+    """
+        This method gets an instance of DeepLabV3-Resnet-50 model given num_classes.
+        If pretrained, then the model is pretrained on a subset of COCO train2017,
+        on the 20 categories that are present in the Pascal VOC dataset. Output layer
+        of model uses the first num_classes pretrained filters. 0 < num_classes <= 21
+
+        :param num_classes: number of classes
+        :param pretrained: loads pretrained model iff pretrained
+        :return: instance of DeepLabV3-Resnet-50 model.
+        """
+
+    # Checks constraint on num_classes
+    if num_classes <= 0 or num_classes > 21:
+        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
+
+    model = deeplabv3_resnet50(pretrained=False, num_classes=num_classes)
+
+    if not pretrained:
+        return model
+
+    arch_type = 'deeplabv3'
+    backbone = 'resnet50'
+
+    # Loads pretrained model with num_classes number of classes
+    arch = arch_type + '_' + backbone + '_coco'
+    model_url = model_urls[arch]
+
+    if model_url is None:
+        raise NotImplementedError('pretrained {} is not supported as of now'.format(arch))
+    else:
+
+        # Loads state dictionary of pretrained model
+        state_dict = torch.hub.load_state_dict_from_url(model_url, progress=True)
+
+        # gets state dict of model
+        state_dict_self = model.state_dict()
+        for i, (name, param) in enumerate(state_dict_self.items()):
+            if name in ['classifier.4.weight', 'classifier.4.bias']:
+                state_dict_self[name].copy_(state_dict[name][:num_classes])
+                # print(torch.all(model.state_dict()[name] == state_dict[name][:num_classes]))
+            else:
+                state_dict_self[name].copy_(state_dict[name])
+                # print(torch.all(model.state_dict()[name] == state_dict[name]))
+    print('Loaded pretrained model.')
+    return model
+
+
+def get_deeplabv3_resnet101_model_instance(num_classes, pretrained=True):
+    """
+        This method gets an instance of DeepLabV3-Resnet-101 model given num_classes.
+        If pretrained, then the model is pretrained on a subset of COCO train2017,
+        on the 20 categories that are present in the Pascal VOC dataset. Output layer
+        of model uses the first num_classes pretrained filters. 0 < num_classes <= 21
+
+        :param num_classes: number of classes
+        :param pretrained: loads pretrained model iff pretrained
+        :return: instance of DeepLabV3-Resnet-101 model.
+        """
+
+    # Checks constraint on num_classes
+    if num_classes <= 0 or num_classes > 21:
+        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
+
+    model = deeplabv3_resnet101(pretrained=False, num_classes=num_classes)
+
+    if not pretrained:
+        return model
+
+    arch_type = 'deeplabv3'
+    backbone = 'resnet101'
+
+    # Loads pretrained model with num_classes number of classes
+    arch = arch_type + '_' + backbone + '_coco'
+    model_url = model_urls[arch]
+
+    if model_url is None:
+        raise NotImplementedError('pretrained {} is not supported as of now'.format(arch))
+    else:
+
+        # Loads state dictionary of pretrained model
+        state_dict = torch.hub.load_state_dict_from_url(model_url, progress=True)
+
+        # gets state dict of model
+        state_dict_self = model.state_dict()
+        for i, (name, param) in enumerate(state_dict_self.items()):
+            if name in ['classifier.4.weight', 'classifier.4.bias']:
+                state_dict_self[name].copy_(state_dict[name][:num_classes])
+                # print(torch.all(model.state_dict()[name] == state_dict[name][:num_classes]))
+            else:
+                state_dict_self[name].copy_(state_dict[name])
+                # print(torch.all(model.state_dict()[name] == state_dict[name]))
+    print('Loaded pretrained model.')
+    return model
+
+
 def main(args):
     print(args)
     device = args.device
@@ -173,14 +271,14 @@ def main(args):
     # Creates dataloaders
     print("Creating data loaders")
     data_loader_train = torch.utils.data.DataLoader(train, batch_size=args.batch_size, shuffle=True,
-                                              num_workers=args.workers, collate_fn=utils.collate_fn)
+                                                    num_workers=args.workers, collate_fn=utils.collate_fn)
 
     data_loader_train_eval = torch.utils.data.DataLoader(deepcopy(train), batch_size=1, shuffle=False,
-                                              num_workers=args.workers, collate_fn=utils.collate_fn)
+                                                         num_workers=args.workers, collate_fn=utils.collate_fn)
 
     data_loader_val_eval = torch.utils.data.DataLoader(val, batch_size=1,
-                                                  shuffle=False, num_workers=args.workers,
-                                                  collate_fn=utils.collate_fn)
+                                                       shuffle=False, num_workers=args.workers,
+                                                       collate_fn=utils.collate_fn)
 
     print("Creating model")
 
