@@ -12,6 +12,8 @@ from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
 from torchvision.models.segmentation import deeplabv3_resnet50
 from torchvision.models.segmentation import deeplabv3_resnet101
+from torchvision.models.segmentation.segmentation import _segm_model
+
 import numpy as np
 import random
 
@@ -58,31 +60,44 @@ def get_transform(train):
     return T.Compose(transforms)
 
 
-def get_fcn_resnet50_model_instance(num_classes, pretrained=True):
+def get_fcn_resnet50_model_instance(num_classes, pretrained=True, imagenet_pretrained_backbone=False):
     """
-    This method gets an instance of FCN-Resnet-50 model given num_classes, pretrained.
-    If not pretrained, then the resnet backbone is pretrained on ImageNet and the fcn
-    classifier head is randomly initialized. If pretrained, then the model is pretrained on
-    a subset of COCO train2017, on the 20 categories that are present in the Pascal
+    This method gets an instance of FCN-Resnet-50 model given num_classes, pretrained
+    and imagenet_pretrained_backbone. If not pretrained and imagenet_pretrained_backbone,
+    then the resnet backbone is pretrained on ImageNet and the fcn classifier head is
+    randomly initialized. If not pretrained and not imagenet_pretrained_backnone,
+    then the model is randomly initialized. If pretrained, then the model is pretrained
+    on a subset of COCO train2017, on the 20 categories that are present in the Pascal
     VOC dataset. Output layer of model uses the first num_classes pretrained filters.
     0 < num_classes <= 21
 
     :param num_classes: number of classes
     :param pretrained: loads pretrained model iff pretrained
+    :param imagenet_pretrained_backbone: initializes backbone with imagenet pretrained weights iff imagenet_pretrained_backbone
     :return: instance of FCN-Resnet-50 model.
     """
+
+    arch_type = 'fcn'
+    backbone = 'resnet50'
 
     # Checks constraint on num_classes
     if num_classes <= 0 or num_classes > 21:
         raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
 
-    model = fcn_resnet50(pretrained=False, num_classes=num_classes)
+    # Checks constraint on pretrained backbone
+    if pretrained and imagenet_pretrained_backbone:
+        raise NotImplementedError('COCO pretrained model does not support ImageNet pretrained backbone.')
 
-    if not pretrained:
+    # Gets model with random weights, if not pretrained and not imagenet_pretrained_backbone
+    if not pretrained and not imagenet_pretrained_backbone:
+        model = _segm_model(arch_type, backbone, num_classes, None, pretrained_backbone=False)
         return model
 
-    arch_type = 'fcn'
-    backbone = 'resnet50'
+    model = fcn_resnet50(pretrained=False, num_classes=num_classes)
+
+    # Gets model with Imagenet pretrained backbone and unpretrained classifier head, if pretrained=False and imagenet_pretrained_backbone=True
+    if not pretrained:
+        return model
 
     # Loads pretrained model with num_classes number of classes
     arch = arch_type + '_' + backbone + '_coco'
@@ -104,35 +119,49 @@ def get_fcn_resnet50_model_instance(num_classes, pretrained=True):
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
     print('Loaded pretrained model')
+
+    # Gets COCO pretrained model otherwise
     return model
 
 
-def get_fcn_resnet101_model_instance(num_classes, pretrained=True):
+def get_fcn_resnet101_model_instance(num_classes, pretrained=True, imagenet_pretrained_backbone=False):
     """
-    This method gets an instance of FCN-Resnet-101 model given num_classes.
-    If not pretrained, then the resnet backbone is pretrained on ImageNet and the fcn
-    classifier head is randomly initialized. If pretrained, then the model is pretrained on a
-    subset of COCO train2017, on the 20 categories that are present in the Pascal
+    This method gets an instance of FCN-Resnet-101 model given num_classes, pretrained,
+    and imagenet_pretrained_backbone. If not pretrained and imagenet_pretrained_backbone,
+    then the resnet backbone is pretrained on ImageNet and the fcn classifier head is
+    randomly initialized. If not pretrained and not imagenet_pretrained_backnone,
+    then the model is randomly initialized. If pretrained, then the model is pretrained
+    on a subset of COCO train2017, on the 20 categories that are present in the Pascal
     VOC dataset. Output layer of model uses the first num_classes pretrained filters.
-    0 < num_classes <= 21
 
     :param num_classes: number of classes
     :param pretrained: loads pretrained model iff pretrained
+    :param imagenet_pretrained_backbone: initializes backbone with imagenet pretrained weights iff imagenet_pretrained_backbone
     :return: instance of FCN-Resnet-101 model.
     """
-
-    # Checks constraint on num_classes
-    if num_classes <= 0 or num_classes > 21:
-        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
-
-    model = fcn_resnet101(pretrained=False, num_classes=num_classes)
-
-    if not pretrained:
-        return model
 
     arch_type = 'fcn'
     backbone = 'resnet101'
 
+    # Checks constraint on num_classes
+    if num_classes <= 0 or num_classes > 21:
+        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
+
+    # Checks constraint on pretrained backbone
+    if pretrained and imagenet_pretrained_backbone:
+        raise NotImplementedError('COCO pretrained model does not support ImageNet pretrained backbone.')
+
+    # Gets model with random weights, if not pretrained and not imagenet_pretrained_backbone
+    if not pretrained and not imagenet_pretrained_backbone:
+        model = _segm_model(arch_type, backbone, num_classes, None, pretrained_backbone=False)
+        return model
+
+    model = fcn_resnet101(pretrained=False, num_classes=num_classes)
+
+    # Gets model with Imagenet pretrained backbone and unpretrained classifier head, if pretrained=False and imagenet_pretrained_backbone=True
+    if not pretrained:
+        return model
+
     # Loads pretrained model with num_classes number of classes
     arch = arch_type + '_' + backbone + '_coco'
     model_url = model_urls[arch]
@@ -153,35 +182,49 @@ def get_fcn_resnet101_model_instance(num_classes, pretrained=True):
                 state_dict_self[name].copy_(state_dict[name])
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
     print('Loaded pretrained model.')
+
+    # Gets COCO pretrained model otherwise
     return model
 
 
-def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True):
+def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True, imagenet_pretrained_backbone=False):
     """
-        This method gets an instance of DeepLabV3-Resnet-50 model given num_classes.
-        If not pretrained, then the resnet backbone is pretrained on ImageNet and the deeplabv3
-        classifier head is randomly initialized. If pretrained, then the model is pretrained on
-        a subset of COCO train2017, on the 20 categories that are present in the
-        Pascal VOC dataset. Output layer of model uses the first num_classes
-        pretrained filters. 0 < num_classes <= 21
+        This method gets an instance of DeepLabV3-Resnet-50 model given num_classes, pretrained, and
+        imagenet_pretrained_backbone. If not pretrained and imagenet_pretrained_backbone,
+        then the resnet backbone is pretrained on ImageNet and the Deeplabv3 classifier head is
+        randomly initialized. If not pretrained and not imagenet_pretrained_backnone,
+        then the model is randomly initialized. If pretrained, then the model is pretrained
+        on a subset of COCO train2017, on the 20 categories that are present in the Pascal
+        VOC dataset. Output layer of model uses the first num_classes pretrained filters.
 
         :param num_classes: number of classes
         :param pretrained: loads pretrained model iff pretrained
+        :param imagenet_pretrained_backbone: initializes backbone with imagenet pretrained weights iff imagenet_pretrained_backbone
         :return: instance of DeepLabV3-Resnet-50 model.
         """
-
-    # Checks constraint on num_classes
-    if num_classes <= 0 or num_classes > 21:
-        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
-
-    model = deeplabv3_resnet50(pretrained=False, num_classes=num_classes)
-
-    if not pretrained:
-        return model
 
     arch_type = 'deeplabv3'
     backbone = 'resnet50'
 
+    # Checks constraint on num_classes
+    if num_classes <= 0 or num_classes > 21:
+        raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
+
+    # Checks constraint on pretrained backbone
+    if pretrained and imagenet_pretrained_backbone:
+        raise NotImplementedError('COCO pretrained model does not support ImageNet pretrained backbone.')
+
+    # Gets model with random weights, if not pretrained and not imagenet_pretrained_backbone
+    if not pretrained and not imagenet_pretrained_backbone:
+        model = _segm_model(arch_type, backbone, num_classes, None, pretrained_backbone=False)
+        return model
+
+    model = deeplabv3_resnet50(pretrained=False, num_classes=num_classes)
+
+    # Gets model with Imagenet pretrained backbone and unpretrained classifier head, if pretrained=False and imagenet_pretrained_backbone=True
+    if not pretrained:
+        return model
+
     # Loads pretrained model with num_classes number of classes
     arch = arch_type + '_' + backbone + '_coco'
     model_url = model_urls[arch]
@@ -206,34 +249,49 @@ def get_deeplabv3_resnet50_model_instance(num_classes, pretrained=True):
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
             # print('After: ', name, state_dict_self[name])
     print('Loaded pretrained model.')
+
+    # Gets COCO pretrained model otherwise
     return model
 
 
-def get_deeplabv3_resnet101_model_instance(num_classes, pretrained=True):
+def get_deeplabv3_resnet101_model_instance(num_classes, pretrained=True, imagenet_pretrained_backbone=False):
     """
-        This method gets an instance of DeepLabV3-Resnet-101 model given num_classes.
-        If not pretrained, then the resnet backbone is pretrained on ImageNet
-        and the deeplabv3 classifier head is randomly initialized. If pretrained, then the
-        model is pretrained on a subset of COCO train2017, on the 20 categories
-        that are present in the Pascal VOC dataset. Output layer of model uses
-        the first num_classes pretrained filters. 0 < num_classes <= 21
+        This method gets an instance of DeepLabV3-Resnet-101 model given num_classes, pretrained,
+        and imagenet_pretrained_backbone. If not pretrained and imagenet_pretrained_backbone,
+        then the resnet backbone is pretrained on ImageNet and the Deeplabv3 classifier head is
+        randomly initialized. If not pretrained and not imagenet_pretrained_backnone,
+        then the model is randomly initialized. If pretrained, then the model is pretrained
+        on a subset of COCO train2017, on the 20 categories that are present in the Pascal
+        VOC dataset. Output layer of model uses the first num_classes pretrained filters.
 
         :param num_classes: number of classes
         :param pretrained: loads pretrained model iff pretrained
+        :param pretrained: loads pretrained model iff pretrained
+        :param imagenet_pretrained_backbone: initializes backbone with imagenet pretrained weights iff imagenet_pretrained_backbone
         :return: instance of DeepLabV3-Resnet-101 model.
-        """
+    """
+
+    arch_type = 'deeplabv3'
+    backbone = 'resnet101'
 
     # Checks constraint on num_classes
     if num_classes <= 0 or num_classes > 21:
         raise NotImplementedError('num_classes={} is out of range.'.format(num_classes))
 
-    model = deeplabv3_resnet101(pretrained=False, num_classes=num_classes)
+    # Checks constraint on pretrained backbone
+    if pretrained and imagenet_pretrained_backbone:
+        raise NotImplementedError('COCO pretrained model does not support ImageNet pretrained backbone.')
 
-    if not pretrained:
+    # Gets model with random weights, if not pretrained and not imagenet_pretrained_backbone
+    if not pretrained and not imagenet_pretrained_backbone:
+        model = _segm_model(arch_type, backbone, num_classes, None, pretrained_backbone=False)
         return model
 
-    arch_type = 'deeplabv3'
-    backbone = 'resnet101'
+    model = deeplabv3_resnet101(pretrained=False, num_classes=num_classes)
+
+    # Gets model with Imagenet pretrained backbone and unpretrained classifier head, if pretrained=False and imagenet_pretrained_backbone=True
+    if not pretrained:
+        return model
 
     # Loads pretrained model with num_classes number of classes
     arch = arch_type + '_' + backbone + '_coco'
@@ -259,6 +317,8 @@ def get_deeplabv3_resnet101_model_instance(num_classes, pretrained=True):
                 # print(torch.all(model.state_dict()[name] == state_dict[name]))
             # print('After: ', name, state_dict_self[name])
     print('Loaded pretrained model.')
+
+    # Gets COCO pretrained model otherwise
     return model
 
 
@@ -301,13 +361,13 @@ def main(args):
 
     # Create the correct model type
     if args.model == 'fcn_resnet50':
-        model = get_fcn_resnet50_model_instance(num_classes, pretrained=args.pretrained)
+        model = get_fcn_resnet50_model_instance(num_classes, pretrained=args.pretrained, imagenet_pretrained_backbone=args.imagenet_pretrained_backbone)
     elif args.model == 'fcn_resnet101':
-        model = get_fcn_resnet101_model_instance(num_classes, pretrained=args.pretrained)
+        model = get_fcn_resnet101_model_instance(num_classes, pretrained=args.pretrained, imagenet_pretrained_backbone=args.imagenet_pretrained_backbone)
     elif args.model == 'deeplabv3_resnet50':
-        model = get_deeplabv3_resnet50_model_instance(num_classes, pretrained=args.pretrained)
+        model = get_deeplabv3_resnet50_model_instance(num_classes, pretrained=args.pretrained, imagenet_pretrained_backbone=args.imagenet_pretrained_backbone)
     else:
-        model = get_deeplabv3_resnet101_model_instance(num_classes, pretrained=args.pretrained)
+        model = get_deeplabv3_resnet101_model_instance(num_classes, pretrained=args.pretrained, imagenet_pretrained_backbone=args.imagenet_pretrained_backbone)
 
     # Moves model to the right device
     model = model.to(device)
@@ -373,11 +433,12 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='PyTorch Detection Training')
-    parser.add_argument('--data_path', default='/media/zhang205/Datasets1/Datasets/MinneApple/detection', help='dataset')
+    parser.add_argument('--data_path', default='/media/zhang205/Datasets/Datasets/MinneApple/detection', help='dataset')
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--val_percent', default=0.1, type=float, metavar='V', help='percent of train set for validation split')
-    parser.add_argument('--model', default='deeplabv3_resnet101', help='model: fcn_resnet50, fcn_resnet101, deeplabv3_resnet50, deeplabv3_resnet101')
+    parser.add_argument('--model', default='fcn_resnet101', help='model: fcn_resnet50, fcn_resnet101, deeplabv3_resnet50, deeplabv3_resnet101')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads pretrained model iff pretrained')
+    parser.add_argument('--imagenet_pretrained_backbone', dest='imagenet_pretrained_backbone', action='store_true', help='loads imagenet pretrained backbone iff pretrained_backbone')
     parser.add_argument('--device', default='cuda', help='device')
     parser.add_argument('-b', '--batch-size', default=1, type=int)
     parser.add_argument('--drop_last_batch', dest='drop_last_batch', action='store_true',
