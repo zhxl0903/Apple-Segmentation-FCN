@@ -406,5 +406,16 @@ if __name__ == "__main__":
 
     if args.output_dir:
         utils.mkdir(args.output_dir)
+        test_arr = np.array([1, 2, 3, 4, 5])
+        output_path = os.path.join(args.output_dir, "test_arr")
+        np.save(output_path, test_arr)
+        print(f"*** Test save to {output_path}")
+    #
+    # print("*** ARGS:", args)
 
+    from azureml.core import Run
+    data_path = Run.get_context().input_datasets['data_path']
+    args.data_path = data_path
+
+    torch.cuda.empty_cache()
     main(args)

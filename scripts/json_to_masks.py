@@ -80,6 +80,8 @@ def main():
 
 
 def get_args():
+    import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--base_path', type=str)
     parser.add_argument('--out_path', type=str)

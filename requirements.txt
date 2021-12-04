@@ -1,0 +1,10 @@
+Pillow
+imageio
+opencv-contrib-python
+scikit-learn
+numpy
+torch
+torchvision
+torchaudio
+
+
