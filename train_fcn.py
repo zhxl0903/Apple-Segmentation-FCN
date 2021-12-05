@@ -12,6 +12,7 @@ from torchvision.models.segmentation import fcn_resnet50
 from torchvision.models.segmentation import fcn_resnet101
 from torchvision.models.segmentation import deeplabv3_resnet50
 from torchvision.models.segmentation import deeplabv3_resnet101
+
 import numpy as np
 import random
 
