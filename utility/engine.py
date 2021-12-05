@@ -9,7 +9,7 @@ from sklearn.metrics import confusion_matrix
 from torch.nn import CrossEntropyLoss
 
 import utility.utils as utils
-from segmentation_eval import computeMetrics
+from eval.segmentation_eval import computeMetrics
 
 
 def train_one_epoch_fcn(model, optimizer, data_loader, device, epoch, print_freq):
