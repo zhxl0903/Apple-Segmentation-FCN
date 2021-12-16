@@ -43,13 +43,13 @@ To train a FCN or DeeplabV3 model on the MinneApple dataset, download the datase
 * Now, you can train a FCN-ResNet50, FCN-ResNet101, DeeplabV3-ResNet50, or DeeplabV3-ResNet101 network with the following commands.
 ```
 # Train FCN-ResNet50
-python train_fcn.py --data_path /path/to/MinneApple/dataset --model fcn_resnet50 --epochs 64 --output-dir /path/to/checkpoint/directory
+python train_fcn.py --data_path /path/to/MinneApple/detection/dataset --model fcn_resnet50 --epochs 64 --output-dir /path/to/checkpoint/directory
 # Train FCN-ResNet101
-python train_fcn.py --data_path /path/to/MinneApple/dataset --model fcn_resnet101 --epochs 64 --output-dir /path/to/checkpoint/directory
+python train_fcn.py --data_path /path/to/MinneApple/detection/dataset --model fcn_resnet101 --epochs 64 --output-dir /path/to/checkpoint/directory
 # Train FCN-ResNet50
-python train_fcn.py --data_path /path/to/MinneApple/dataset --model deeplabv3_resnet50 --epochs 64 --output-dir /path/to/checkpoint/directory
+python train_fcn.py --data_path /path/to/MinneApple/detection/dataset --model deeplabv3_resnet50 --epochs 64 --output-dir /path/to/checkpoint/directory
 # Train FCN-ResNet101
-python train_fcn.py --data_path /path/to/MinneApple/dataset --model deeplabv3_resnet101 --epochs 64 --output-dir /path/to/checkpoint/directory
+python train_fcn.py --data_path /path/to/MinneApple/detection/dataset --model deeplabv3_resnet101 --epochs 64 --output-dir /path/to/checkpoint/directory
 ```
 * DeeplabV3 models require a batch size greater than 1 during training. You can set the batch size using argument: --batch-size n (Here, n is the batch size)
 * DeeplabV3 models require the size of the last minibatch to be greater than 1. You can drop the last minibatch using argument: --drop_last_batch
@@ -60,13 +60,13 @@ python train_fcn.py --data_path /path/to/MinneApple/dataset --model deeplabv3_re
 To use a model for prediction run the following command:
 ```
 # Predict for FCN-ResNet50
-python predict_fcn.py --data_path /path/to/MinneApple/dataset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --fcn_resnet50
+python predict_fcn.py --data_path /path/to/MinneApple/detection/dataset/testset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --fcn_resnet50
 # Predict for FCN-ResNet101
-python predict_fcn.py --data_path /path/to/MinneApple/dataset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --fcn_resnet101
+python predict_fcn.py --data_path /path/to/MinneApple/detection/dataset/testset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --fcn_resnet101
 # Predict for DeeplabV3-ResNet50
-python predict_fcn.py --data_path /path/to/MinneApple/dataset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --deeplabv3_resnet50
+python predict_fcn.py --data_path /path/to/MinneApple/detection/dataset/testset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --deeplabv3_resnet50
 # Predict for DeeplabV3-ResNet101
-python predict_fcn.py --data_path /path/to/MinneApple/dataset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --deeplabv3_resnet101
+python predict_fcn.py --data_path /path/to/MinneApple/detection/dataset/testset --output_path /path/to/which/to/write/the/predictions --weight_file /path/to/a/weight/file --device [one out of: cpu/gpu] --deeplabv3_resnet101
 ```
 
 ## Evaluation on MinneApple Test Set
