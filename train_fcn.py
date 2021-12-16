@@ -437,7 +437,7 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', default='AppleDataset', help='dataset')
     parser.add_argument('--val_percent', default=0.1, type=float, metavar='V', help='percent of train set for validation split')
     parser.add_argument('--model', default='fcn_resnet101', help='model: fcn_resnet50, fcn_resnet101, deeplabv3_resnet50, deeplabv3_resnet101')
-    parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads pretrained model iff pretrained')
+    parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='loads COCO pretrained model iff pretrained')
     parser.add_argument('--imagenet_pretrained_backbone', dest='imagenet_pretrained_backbone', action='store_true', help='loads imagenet pretrained backbone iff pretrained_backbone')
     parser.add_argument('--device', default='cuda', help='device')
     parser.add_argument('-b', '--batch-size', default=1, type=int)
