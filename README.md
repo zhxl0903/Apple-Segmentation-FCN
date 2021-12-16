@@ -1,4 +1,4 @@
-# Fully Convolutional Networks (FCN) for Apple Segmentation
+# Fully Convolutional Networks for Apple Segmentation
 This project performs Apple Segmentation task on MinneApple dataset using some fully convolutional models including Fully Convolutional Networks (FCN) and DeeplabV3.
 
 ## Evaluation
