@@ -57,6 +57,8 @@ python train_fcn.py --data_path /path/to/MinneApple/detection/dataset --model de
 * To train the model with COCO pretraining, use the argument: --pretrained
 
 ## Prediction 
+The models trained in this project can be downloaded using a YorkU account: [models](https://yuoffice-my.sharepoint.com/:f:/g/personal/zhang205_yorku_ca/Eo3djF_7BudGqfbVklTxRnMBi9smQJmuSYh4ZU_krBObrQ?e=pXRh6k).
+
 To use a model for prediction run the following command:
 ```
 # Predict for FCN-ResNet50
